@@ -49,6 +49,8 @@ The roadmap assumes one developer. Estimates are deliberately omitted because qu
 
 ## 5. Phase 2 — Supabase foundation, schema core, and authentication
 
+Phase 2 begins with a bounded Phase 2A foundation slice: compatible dependencies and scripts, value-free environment documentation and typed public/server validation, local Supabase configuration, and recorded architecture/schema decisions. Phase 2A intentionally creates no application tables, RLS policies, authentication pages, or protected routes.
+
 ### Deliverables
 
 - Add local/test Supabase workflow, migration directory, generated types, and separated browser/user-server/service-role clients.

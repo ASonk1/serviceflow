@@ -309,9 +309,9 @@ Most domain cases belong in fast unit tests; database security/concurrency belon
 
 ### Environments
 
-- Local: local Supabase preferred, Stripe CLI test webhooks, Resend sandbox/test recipient restrictions, deterministic seed.
+- Local: local Supabase through Docker is required, with Stripe CLI test webhooks, Resend sandbox/test recipient restrictions, and deterministic fictional seed data.
 - Preview: isolated Supabase branch/project where available, Stripe test mode, preview callback/webhook URL, restricted demo mail.
-- Production portfolio: dedicated Supabase production project, Stripe test mode clearly labeled, verified Resend sender/domain, Vercel production deployment.
+- Production portfolio: dedicated Supabase production project in the EU/Frankfurt region, Stripe test mode clearly labeled, verified Resend sender/domain, Vercel production deployment.
 
 Preview must not point at the production database. Production does not auto-seed demo credentials unless explicitly designed as a public demo tenant with safe reset policy.
 
@@ -351,3 +351,13 @@ Only `NEXT_PUBLIC_*` values may enter browser bundles, and those are frozen at b
 - Background queue infrastructure is deferred; durable database outbox plus cron is sufficient for initial scale.
 - Materialized analytics, real-time subscriptions, and calendar sync are deferred until measured demand.
 - Custom domain/multi-location modeling is intentionally not prebuilt. Adding them later requires an explicit schema and route migration.
+
+## 16. Phase 2 foundation decisions
+
+- Supabase PostgreSQL, Supabase Auth, and PostgreSQL RLS are the approved identity and persistence foundation. Vercel remains the primary deployment target; Cloudflare is a portability constraint, so runtime code should avoid unnecessary platform-specific and native Node.js dependencies.
+- Email/password is the only v1 authentication method and passwords require at least 12 characters. `user_profiles` rows will be created by a minimal database trigger on `auth.users`; the trigger must set all privileged fields itself and must not copy caller-controlled role data.
+- Browser-safe configuration is limited to the canonical app URL, Supabase URL, and Supabase publishable key. The service-role key is server-only and must be isolated behind a `server-only` module when its client is introduced.
+- Supported organization currencies are `RON`, `EUR`, `USD`, and `GBP`. Recurring weekdays use ISO numbering from Monday `1` through Sunday `7`.
+- Pending staff invitations may have a null `user_id` until verified acceptance. Platform administrators use narrow audited functions or views rather than unrestricted tenant-table access.
+- Reserved organization slugs are `admin`, `api`, `auth`, `dashboard`, `client`, `demo`, `features`, `login`, `onboarding`, `privacy`, `sign-in`, `sign-up`, `support`, `terms`, and `www`.
+- Local Supabase through Docker is required for development and database integration tests. Seeds must be deterministic and fictional; real customer data and production credentials are prohibited in every demo environment.

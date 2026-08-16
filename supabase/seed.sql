@@ -1,0 +1,2 @@
+-- Phase 2A intentionally contains no application schema or seed records.
+-- Future seeds must be deterministic, fictional, idempotent, and local/test only.
