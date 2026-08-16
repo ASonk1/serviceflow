@@ -13,6 +13,7 @@
     "supabase:status": "supabase status",
     "supabase:reset": "supabase db reset",
     "supabase:lint": "supabase db lint",
+    "supabase:test": "supabase test db --local supabase/tests",
     "supabase:types": "mkdir -p src/types && supabase gen types typescript --local > src/types/database.ts"
   },
   "dependencies": {

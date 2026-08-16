@@ -231,6 +231,8 @@ A tenant’s view of a client; one user can have separate records at different o
 
 Constraints/indexes: unique `(organization_id, email_normalized)` for v1 identity model; unique partial `(organization_id, user_id) where user_id is not null`; `(organization_id, last_booked_at desc, id)`. Linking requires verified email or verified capability; never trust an entered email to claim history.
 
+Phase 2 exposes linked client data through the narrow `get_my_client_records()` function, which omits owner notes. Authenticated owners cannot directly set or change `user_id`; a later verified claim/link function must own that transition.
+
 ### `appointments`
 
 | Column | Type | Rules |
@@ -363,7 +365,7 @@ Append-only important-action trail, not full observability.
 | `ip_hash` | text nullable | salted privacy-preserving abuse trace |
 | `created_at` | timestamptz | immutable |
 
-Indexes: `(organization_id, created_at desc, id)`, `(actor_user_id, created_at desc)`, `(target_type, target_id, created_at desc)`, and platform partial index for null organization. Owners select safe tenant rows; only trusted functions insert; no ordinary update/delete.
+Indexes: `(organization_id, created_at desc, id)`, `(actor_user_id, created_at desc)`, `(target_type, target_id, created_at desc)`, and platform partial index for null organization. Owners select safe tenant rows; only the unexposed private audit writer, called by future trusted domain functions, inserts application events. Ordinary roles and the service role cannot insert/update/delete audit rows directly.
 
 ### Optional `scheduled_job_runs`
 
