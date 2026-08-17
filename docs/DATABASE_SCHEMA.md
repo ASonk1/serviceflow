@@ -119,6 +119,12 @@ One-to-one with organization.
 | `policy_text` | text nullable | bounded public policy |
 | timestamps | timestamptz | standard |
 
+### `onboarding_progress`
+
+One row per draft organization. It stores nullable completion timestamps for `business_identity`, `location`, `booking_policies`, `staff_profile`, `service`, `availability`, `review`, and `publish`. A check constraint enforces sequence order; there is no arbitrary browser-authored JSON state. RLS permits only an active owner to read the row, while writes are limited to authenticated onboarding functions that derive the caller from `auth.uid()`. The first null timestamp is the deterministic resume point. `organizations.onboarding_step` is retained as a display hint only and is never authoritative.
+
+`start_owner_onboarding()` serializes starts per authenticated user and atomically creates or resolves the draft organization, default settings, active owner membership, and progress row. Step functions accept an organization identifier only as a resource target, re-check that the caller is its verified active draft owner, validate persisted values, and advance progress in the same transaction.
+
 ## 4. Catalog and staffing
 
 ### `services`

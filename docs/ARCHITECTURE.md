@@ -143,6 +143,8 @@ Use Server Actions for first-party form mutations: onboarding, service/staff/set
 
 Server Actions use POST but remain directly invokable endpoints. Hiding a button is never authorization.
 
+Owner onboarding uses a user-session Supabase client, never the service-role client. Its start RPC is transactionally idempotent and takes no user ID; it locks on `auth.uid()` before resolving or creating a draft. Each implemented step has a focused Zod schema and a matching security-definer RPC with a fixed empty `search_path`. Progress is a constrained relational row of completion timestamps, and the server always resumes from the first incomplete persisted step rather than trusting a route or browser step number. Active draft ownership resolves to `/onboarding`; only non-draft active tenant membership resolves to the owner dashboard.
+
 ### Route Handlers
 
 Use Route Handlers where an HTTP contract is required:
@@ -365,3 +367,9 @@ Only `NEXT_PUBLIC_*` values may enter browser bundles, and those are frozen at b
 - Pending staff invitations may have a null `user_id` until verified acceptance. Platform administrators use narrow audited functions or views rather than unrestricted tenant-table access.
 - Reserved organization slugs are `admin`, `api`, `auth`, `dashboard`, `client`, `demo`, `features`, `login`, `onboarding`, `privacy`, `sign-in`, `sign-up`, `support`, `terms`, and `www`.
 - Local Supabase through Docker is required for development and database integration tests. Seeds must be deterministic and fictional; real customer data and production credentials are prohibited in every demo environment.
+
+## 17. Phase 3A onboarding decisions
+
+- Phase 3A implements business identity, location/regional settings, and booking policies. Staff profile, service, availability, review, and publish remain represented but incomplete for Phase 3B.
+- Draft organizations are private and unbookable. Platform administrators receive no implicit tenant-table policy; any future support access remains narrow and audited.
+- Slugs are normalized in Zod and PostgreSQL, checked against the documented reserved list, and protected by the existing unique database index.

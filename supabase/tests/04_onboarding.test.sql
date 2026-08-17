@@ -1,0 +1,42 @@
+begin;
+set local search_path=public,extensions;
+select plan(18);
+insert into auth.users(id,email,email_confirmed_at,raw_user_meta_data) values
+ ('00000000-0000-4000-8000-000000009001','owner.onboarding@serviceflow.invalid',now(),'{"display_name":"Fictional Onboarding Owner"}'),
+ ('00000000-0000-4000-8000-000000009002','other.onboarding@serviceflow.invalid',now(),'{"display_name":"Fictional Other Owner"}'),
+ ('00000000-0000-4000-8000-000000009003','suspended.onboarding@serviceflow.invalid',now(),'{"display_name":"Fictional Suspended Owner"}');
+set local role authenticated;
+select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000009001","role":"authenticated"}',true);
+create temp table onboarding_target as select public.start_owner_onboarding() id;
+select is((select count(*) from public.organizations),1::bigint,'start creates one visible draft organization');
+select is((select count(*) from public.organization_settings),1::bigint,'start creates settings atomically');
+select is((select count(*) from public.organization_memberships where role='owner' and status='active'),1::bigint,'start creates active owner membership');
+select is((select count(*) from public.onboarding_progress),1::bigint,'start creates progress');
+select is(public.start_owner_onboarding(),(select id from onboarding_target),'retry resolves same draft');
+select is((select count(*) from public.organization_memberships),1::bigint,'retry does not duplicate membership');
+select throws_ok(format('select public.save_onboarding_business_identity(%L,%L,%L)',(select id from onboarding_target),'Fictional Studio','admin'),'22023','reserved slug','reserved slug rejected in database');
+select throws_ok(format('select public.save_onboarding_business_identity(%L,%L,%L)',(select id from onboarding_target),'Fictional Studio','alpha-wellness-lab'),'23505',null,'duplicate slug rejected in database');
+select lives_ok(format('select public.save_onboarding_business_identity(%L,%L,%L)',(select id from onboarding_target),'Fictional Studio','fictional-onboarding-studio'),'business identity saves');
+select ok((select business_identity_completed_at is not null from public.onboarding_progress),'business progress persists');
+select lives_ok(format('select public.save_onboarding_location(%L,%L,%L,%L,%L)',(select id from onboarding_target),'Europe/Bucharest','RON','RO','Sample City'),'location saves');
+select lives_ok(format('select public.save_onboarding_booking_policies(%L,60,30,1440,720,15,true,%L)',(select id from onboarding_target),'Fictional policy.'),'policies save');
+select ok((select booking_policies_completed_at is not null and staff_profile_completed_at is null from public.onboarding_progress),'implemented progress completes without marking future steps');
+select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000009002","role":"authenticated"}',true);
+select is((select count(*) from public.onboarding_progress),0::bigint,'unrelated owner cannot view draft progress');
+select throws_ok(format('select public.save_onboarding_business_identity(%L,%L,%L)',(select id from onboarding_target),'Forged','forged-other'),'42501','draft not found','forged organization save denied');
+select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000009003","role":"authenticated"}',true);
+create temp table suspended_target as select public.start_owner_onboarding() id;
+grant select on suspended_target to service_role;
+select ok((select id is not null from suspended_target),'second owner can start isolated draft');
+reset role;
+set local role service_role;
+select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000009003","role":"service_role"}',true);
+update public.organizations set status='suspended',suspended_at=now() where id=(select id from suspended_target);
+set local role authenticated;
+select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000009003","role":"authenticated"}',true);
+select throws_ok(format('select public.save_onboarding_business_identity(%L,%L,%L)',(select id from suspended_target),'Nope','suspended-nope'),'42501','draft not found','suspended organization owner cannot mutate onboarding');
+reset role;
+set local role anon;
+select throws_ok('select public.start_owner_onboarding()','42501',null,'anonymous cannot start onboarding');
+select * from finish();
+rollback;

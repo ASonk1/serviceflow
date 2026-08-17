@@ -70,6 +70,8 @@ Phase 2B adds only the core PostgreSQL schema, deny-by-default RLS authorization
 
 ## 6. Phase 3 — Owner onboarding and organization publishing
 
+Progress: Phase 3A foundation is implemented for atomic draft creation, persisted ordered progress, business identity, location/regional settings, and booking policies. Phase 3B retains staff profile, first service, weekly availability, review/publish, public preview, and any optional image storage work.
+
 ### Deliverables
 
 - Resumable multi-step onboarding for business identity/slug, timezone/location/currency, policies, first staff profile, first service, weekly availability, review, and publish.

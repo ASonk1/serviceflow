@@ -187,6 +187,56 @@ export type Database = {
           },
         ]
       }
+      onboarding_progress: {
+        Row: {
+          availability_completed_at: string | null
+          booking_policies_completed_at: string | null
+          business_identity_completed_at: string | null
+          created_at: string
+          location_completed_at: string | null
+          organization_id: string
+          publish_completed_at: string | null
+          review_completed_at: string | null
+          service_completed_at: string | null
+          staff_profile_completed_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          availability_completed_at?: string | null
+          booking_policies_completed_at?: string | null
+          business_identity_completed_at?: string | null
+          created_at?: string
+          location_completed_at?: string | null
+          organization_id: string
+          publish_completed_at?: string | null
+          review_completed_at?: string | null
+          service_completed_at?: string | null
+          staff_profile_completed_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          availability_completed_at?: string | null
+          booking_policies_completed_at?: string | null
+          business_identity_completed_at?: string | null
+          created_at?: string
+          location_completed_at?: string | null
+          organization_id?: string
+          publish_completed_at?: string | null
+          review_completed_at?: string | null
+          service_completed_at?: string | null
+          staff_profile_completed_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_progress_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_memberships: {
         Row: {
           accepted_at: string | null
@@ -620,6 +670,42 @@ export type Database = {
           updated_at: string
         }[]
       }
+      save_onboarding_booking_policies: {
+        Args: {
+          cancellation_minutes: number
+          guests_enabled: boolean
+          horizon_days: number
+          interval_minutes: number
+          lead_minutes: number
+          reschedule_minutes: number
+          target_org_id: string
+          terms?: string
+        }
+        Returns: undefined
+      }
+      save_onboarding_business_identity: {
+        Args: {
+          business_name: string
+          public_slug: string
+          target_org_id: string
+        }
+        Returns: undefined
+      }
+      save_onboarding_location: {
+        Args: {
+          address1?: string
+          address2?: string
+          city_name: string
+          country: string
+          currency_code: string
+          postal?: string
+          region_name?: string
+          target_org_id: string
+          timezone_name: string
+        }
+        Returns: undefined
+      }
+      start_owner_onboarding: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never
