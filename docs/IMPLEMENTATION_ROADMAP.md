@@ -70,7 +70,7 @@ Phase 2B adds only the core PostgreSQL schema, deny-by-default RLS authorization
 
 ## 6. Phase 3 — Owner onboarding and organization publishing
 
-Progress: Phase 3A and Phase 3B core onboarding are implemented: atomic draft creation, all ordered setup steps, owner-operator profile, first service and assignment, transactional weekly availability, persisted review, transactional publish/unpublish/republish, protected draft preview, and the safe `/book/[slug]` public profile. Logo/avatar storage remains deliberately deferred; interactive booking belongs to Phase 5.
+Progress: Phase 3 is complete across 3A–3C: atomic resumable setup, owner-operator profile, first service and assignment, transactional availability/review/publish lifecycle, protected preview, the narrow `/book/[slug]` projection, and optional tenant-scoped organization-logo/staff-avatar media. Interactive booking belongs to Phase 5.
 
 ### Deliverables
 

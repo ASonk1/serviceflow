@@ -759,6 +759,18 @@ export type Database = {
         }
         Returns: string
       }
+      set_organization_logo: {
+        Args: { object_path?: string; target_org_id: string }
+        Returns: string
+      }
+      set_staff_avatar: {
+        Args: {
+          object_path?: string
+          target_org_id: string
+          target_staff_id: string
+        }
+        Returns: string
+      }
       start_owner_onboarding: { Args: never; Returns: string }
       unpublish_organization: {
         Args: { target_org_id: string }

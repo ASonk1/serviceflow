@@ -127,6 +127,10 @@ One row per draft organization. It stores nullable completion timestamps for `bu
 
 Phase 3B adds nullable composite foreign-key references from progress to the authoritative onboarding `staff_profile_id` and `service_id`. These make retries update the same records and prevent cross-tenant references. Completion timestamps remain ordered and can be written only by validated functions.
 
+Phase 3C uses the existing nullable `organizations.logo_path` and `staff_profiles.avatar_path` columns only for validated object names in the public `serviceflow-public-media` bucket. Paths are generated as `organizations/<organization-id>/branding/<uuid>.<safe-extension>` or `organizations/<organization-id>/staff/<staff-profile-id>/<uuid>.<safe-extension>`. Authenticated rows cannot set these references directly: fixed-search-path RPCs derive `auth.uid()`, require a verified active owner and a non-suspended tenant, validate the entity relationship and live storage object metadata, then attach or clear the path and write a redacted audit event.
+
+The bucket is intentionally public because every object it accepts is presentation media destined for anonymous profiles. Its bucket configuration and narrow policies allow only JPEG, PNG, or WebP files from 1 byte through 2 MB. Insert/update/delete policies apply only to this bucket and validate the complete tenant/staff prefix; anonymous, client, staff, suspended, and unrelated-owner mutation remains denied. The public business projection adds only nullable logo/avatar paths and never exposes object ownership metadata or internal entity identifiers.
+
 ## 4. Catalog and staffing
 
 ### `services`

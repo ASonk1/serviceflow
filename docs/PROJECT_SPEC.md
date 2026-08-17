@@ -157,6 +157,7 @@ Phase delivery note: before the Phase 5 booking engine is implemented, the publi
 - Currency amounts use integer minor units; durations are bounded positive minutes.
 - Services cannot be hard-deleted once referenced by an appointment. Archived services are not publicly bookable.
 - Staff profiles can be public/private and contain display name, biography, optional avatar, and active state.
+- Organization logos and staff avatars are optional public presentation assets. They use generated tenant-scoped object names, an image-only 2 MB public bucket, authenticated owner mutation policies, and validated stored object paths; their absence never blocks publication.
 - Only active membership + active staff profile + active assignment can receive new bookings.
 
 ### 7.5 Availability and blocked time
