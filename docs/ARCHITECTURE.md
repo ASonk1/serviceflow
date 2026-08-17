@@ -168,6 +168,10 @@ Server Components call server-only query functions. Query functions accept an au
 - Use the official SSR cookie integration appropriate to the installed packages. Refresh sessions in the request layer/proxy mechanism required by the installed Next.js/Supabase versions.
 - Treat middleware/proxy route checks as an early UX redirect only, not the security boundary.
 
+Phase 2C implements this boundary with four explicit client factories: browser, authenticated server-user, Proxy/session-refresh, and a server-only service-role factory. Ordinary request modules use only the user-scoped client. Proxy calls `getClaims()` for session refresh and optimistic anonymous redirects; protected layouts independently call `getUser()`, resolve protected profile data, active memberships, non-suspended organizations, and linked client records before selecting a destination. Authenticated responses use private/no-store semantics.
+
+Email/password flows use Server Actions with Zod validation and generic credential/reset responses. Callback and confirmation handlers accept only validated internal return paths. Recovery password changes additionally require a short-lived HTTP-only marker bound to the server-verified user; a normal authenticated session alone is not treated as a recovery session. Local Auth redirects are restricted to the local application, and production must configure the exact Vercel URLs and matching Supabase email templates/redirect allowlist.
+
 ### Authorization model
 
 Authorization has three layers:

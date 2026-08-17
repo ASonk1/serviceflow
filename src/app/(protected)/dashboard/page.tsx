@@ -1,0 +1,1 @@
+import { ProtectedPlaceholder } from "@/components/auth/protected-placeholder"; export const metadata = { title: "Workspace" }; export default function Page() { return <ProtectedPlaceholder eyebrow="Owner and staff workspace" title="Your dashboard foundation is secure" />; }

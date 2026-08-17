@@ -48,17 +48,17 @@ export function MobileNavigation() {
             <Link href="/privacy" onClick={() => setOpen(false)}>
               Privacy
             </Link>
+            <Link href="/auth/sign-in" onClick={() => setOpen(false)}>Sign in</Link>
           </nav>
           <Link
-            href="/demo"
+            href="/auth/sign-up"
             className="button button-primary button-full"
             onClick={() => setOpen(false)}
           >
-            Explore the demo
+            Get started
           </Link>
         </div>
       ) : null}
     </div>
   );
 }
-

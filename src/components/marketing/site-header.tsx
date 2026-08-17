@@ -17,8 +17,9 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="desktop-header-action">
-          <Link href="/demo" className="button button-ink button-small">
-            Explore demo
+          <Link href="/auth/sign-in" className="header-sign-in">Sign in</Link>
+          <Link href="/auth/sign-up" className="button button-ink button-small">
+            Get started
             <ArrowRightIcon />
           </Link>
         </div>
@@ -27,4 +28,3 @@ export function SiteHeader() {
     </header>
   );
 }
-

@@ -1,0 +1,2 @@
+import { AuthForm } from "@/components/auth/auth-form"; import { signUpAction } from "@/features/auth/actions"; import { safeReturnPath } from "@/features/auth/return-path";
+export const metadata = { title: "Create account" }; export default async function Page({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) { const params = await searchParams; return <AuthForm kind="sign-up" action={signUpAction} next={typeof params.next === "string" ? safeReturnPath(params.next) : undefined} />; }
