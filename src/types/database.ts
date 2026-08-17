@@ -198,7 +198,9 @@ export type Database = {
           publish_completed_at: string | null
           review_completed_at: string | null
           service_completed_at: string | null
+          service_id: string | null
           staff_profile_completed_at: string | null
+          staff_profile_id: string | null
           updated_at: string
         }
         Insert: {
@@ -211,7 +213,9 @@ export type Database = {
           publish_completed_at?: string | null
           review_completed_at?: string | null
           service_completed_at?: string | null
+          service_id?: string | null
           staff_profile_completed_at?: string | null
+          staff_profile_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -224,7 +228,9 @@ export type Database = {
           publish_completed_at?: string | null
           review_completed_at?: string | null
           service_completed_at?: string | null
+          service_id?: string | null
           staff_profile_completed_at?: string | null
+          staff_profile_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -234,6 +240,20 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "organizations"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_progress_service_fk"
+            columns: ["organization_id", "service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "onboarding_progress_staff_fk"
+            columns: ["organization_id", "staff_profile_id"]
+            isOneToOne: false
+            referencedRelation: "staff_profiles"
+            referencedColumns: ["organization_id", "id"]
           },
         ]
       }
@@ -522,6 +542,7 @@ export type Database = {
           display_name: string
           id: string
           is_public: boolean
+          job_title: string | null
           membership_id: string
           organization_id: string
           status: string
@@ -534,6 +555,7 @@ export type Database = {
           display_name: string
           id?: string
           is_public?: boolean
+          job_title?: string | null
           membership_id: string
           organization_id: string
           status?: string
@@ -546,6 +568,7 @@ export type Database = {
           display_name?: string
           id?: string
           is_public?: boolean
+          job_title?: string | null
           membership_id?: string
           organization_id?: string
           status?: string
@@ -656,6 +679,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      complete_onboarding_review: {
+        Args: { target_org_id: string }
+        Returns: undefined
+      }
       get_my_client_records: {
         Args: never
         Returns: {
@@ -669,6 +696,12 @@ export type Database = {
           phone: string
           updated_at: string
         }[]
+      }
+      get_public_business: { Args: { public_slug: string }; Returns: Json }
+      publish_organization: { Args: { target_org_id: string }; Returns: string }
+      replace_onboarding_availability: {
+        Args: { intervals: Json; target_org_id: string }
+        Returns: undefined
       }
       save_onboarding_booking_policies: {
         Args: {
@@ -705,7 +738,32 @@ export type Database = {
         }
         Returns: undefined
       }
+      save_onboarding_service: {
+        Args: {
+          service_buffer: number
+          service_description: string
+          service_duration: number
+          service_name: string
+          service_price_minor: number
+          target_org_id: string
+        }
+        Returns: string
+      }
+      save_onboarding_staff_profile: {
+        Args: {
+          public_visible?: boolean
+          staff_bio?: string
+          staff_job_title?: string
+          staff_name: string
+          target_org_id: string
+        }
+        Returns: string
+      }
       start_owner_onboarding: { Args: never; Returns: string }
+      unpublish_organization: {
+        Args: { target_org_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

@@ -87,6 +87,8 @@ Rules:
 4. The owner can save progress and resume. The organization remains `draft` and unbookable until required data exists.
 5. Publishing makes `/book/[slug]` available. The owner sees a checklist and preview.
 
+Phase delivery note: before the Phase 5 booking engine is implemented, the published route is an informational public profile only. It displays allowlisted business, staff, service, and weekly-hours data and clearly disables interactive booking rather than simulating an appointment.
+
 ### 6.3 Owner operations
 
 1. The owner sees today/upcoming appointments, status summaries, recent activity, and setup alerts.

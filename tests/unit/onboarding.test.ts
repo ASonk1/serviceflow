@@ -1,6 +1,6 @@
 import {describe,expect,it} from "vitest";
-import {firstIncompleteStep,type ProgressFlags} from "@/features/onboarding/model";
-import {bookingPoliciesSchema,businessIdentitySchema,locationSchema,normalizeSlug} from "@/features/onboarding/schemas";
+import {firstIncompleteStep,publicationReady,type ProgressFlags} from "@/features/onboarding/model";
+import {availabilitySchema,bookingPoliciesSchema,businessIdentitySchema,formatMinorPrice,intervalsOverlap,locationSchema,normalizeIntervals,normalizeSlug,parsePriceToMinor,serviceSchema,staffProfileSchema} from "@/features/onboarding/schemas";
 const id="10000000-0000-4000-8000-000000000001";
 describe("owner onboarding validation",()=>{
  it("normalizes safe slugs",()=>expect(normalizeSlug("  Fictional-Studio ")).toBe("fictional-studio"));
@@ -10,3 +10,10 @@ describe("owner onboarding validation",()=>{
  it("bounds and relates booking policies",()=>{const base={organizationId:id,minimumLeadMinutes:"60",bookingHorizonDays:"30",cancellationNoticeMinutes:"1440",rescheduleNoticeMinutes:"720",slotIntervalMinutes:"15"};expect(bookingPoliciesSchema.safeParse(base).success).toBe(true);expect(bookingPoliciesSchema.safeParse({...base,bookingHorizonDays:"0"}).success).toBe(false);expect(bookingPoliciesSchema.safeParse({...base,minimumLeadMinutes:"50000",bookingHorizonDays:"1"}).success).toBe(false);expect(bookingPoliciesSchema.safeParse({...base,slotIntervalMinutes:"17"}).success).toBe(false)});
 });
 describe("deterministic progress",()=>{it("returns the first incomplete step without trusting a browser step",()=>{const flags:ProgressFlags={"business-identity":true,location:true,"booking-policies":false,"staff-profile":false,service:false,availability:false,review:false,publish:false};expect(firstIncompleteStep(flags)).toBe("booking-policies");expect(firstIncompleteStep({...flags,"booking-policies":true})).toBe("staff-profile")})});
+describe("Phase 3B validation",()=>{
+ it("validates the owner staff profile",()=>{expect(staffProfileSchema.safeParse({organizationId:id,staffName:"Fictional Owner",staffBio:"Short fictional biography.",jobTitle:"Founder"}).success).toBe(true);expect(staffProfileSchema.safeParse({organizationId:id,staffName:"",staffBio:""}).success).toBe(false)});
+ it("parses and formats integer minor-unit prices",()=>{expect(parsePriceToMinor("125.50")).toBe(12550);expect(parsePriceToMinor("12.345")).toBeNull();expect(parsePriceToMinor("NaN")).toBeNull();expect(formatMinorPrice(12550,"EUR","en-US")).toContain("125.50")});
+ it("bounds service duration and buffer",()=>{const base={organizationId:id,serviceName:"Fictional Session",serviceDescription:"",durationMinutes:"60",bufferMinutes:"15",price:"125.00"};expect(serviceSchema.safeParse(base).success).toBe(true);expect(serviceSchema.safeParse({...base,durationMinutes:"0"}).success).toBe(false);expect(serviceSchema.safeParse({...base,bufferMinutes:"241"}).success).toBe(false)});
+ it("normalizes intervals and detects overlap",()=>{const intervals=[{weekday:3,start:"13:00",end:"17:00"},{weekday:1,start:"09:00",end:"12:00"}];expect(normalizeIntervals(intervals)[0].weekday).toBe(1);expect(intervalsOverlap([...intervals,{weekday:1,start:"11:00",end:"13:00"}])).toBe(true);expect(availabilitySchema.safeParse({organizationId:id,intervals:JSON.stringify(intervals)}).success).toBe(true);expect(availabilitySchema.safeParse({organizationId:id,intervals:"[]"}).success).toBe(false)});
+ it("calculates publication readiness from every persisted step",()=>{const complete:ProgressFlags={"business-identity":true,location:true,"booking-policies":true,"staff-profile":true,service:true,availability:true,review:true,publish:false};expect(publicationReady(complete)).toBe(true);expect(publicationReady({...complete,availability:false})).toBe(false)});
+});

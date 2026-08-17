@@ -13,3 +13,5 @@ export type ProgressFlags = Record<OnboardingStep, boolean>;
 export function firstIncompleteStep(progress: ProgressFlags): OnboardingStep {
   return onboardingSteps.find((step) => !progress[step.key])?.key ?? "publish";
 }
+export function editableStep(requested:string|undefined,progress:ProgressFlags):OnboardingStep|null{if(!requested)return null;const item=onboardingSteps.find(step=>step.key===requested);if(!item||item.key==="publish")return null;const first=firstIncompleteStep(progress);const requestedIndex=onboardingSteps.findIndex(step=>step.key===item.key);const firstIndex=onboardingSteps.findIndex(step=>step.key===first);return requestedIndex<firstIndex&&progress[item.key]?item.key:null;}
+export function publicationReady(progress:ProgressFlags){return onboardingSteps.filter(step=>step.key!=="publish").every(step=>progress[step.key]);}

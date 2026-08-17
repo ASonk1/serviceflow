@@ -373,3 +373,11 @@ Only `NEXT_PUBLIC_*` values may enter browser bundles, and those are frozen at b
 - Phase 3A implements business identity, location/regional settings, and booking policies. Staff profile, service, availability, review, and publish remain represented but incomplete for Phase 3B.
 - Draft organizations are private and unbookable. Platform administrators receive no implicit tenant-table policy; any future support access remains narrow and audited.
 - Slugs are normalized in Zod and PostgreSQL, checked against the documented reserved list, and protected by the existing unique database index.
+
+## 18. Phase 3B publication decisions
+
+- The first onboarding staff profile is an idempotent public owner-operator profile linked to the authenticated owner membership. The progress row stores the authoritative first staff and service identifiers; callers never choose membership, user, currency, staff, or service relationships.
+- Weekly availability is submitted as a bounded transient array, validated completely in PostgreSQL, and replaced in one transaction. Stable UUIDs are derived from tenant, staff, weekday, and interval values; the existing exclusion constraint remains the final overlap backstop.
+- Review and publication readiness are recalculated from persisted relational data. Publication locks the organization, checks every identity/settings/staff/service/assignment/availability invariant, changes lifecycle state, marks progress, and writes an audit event atomically. Direct authenticated lifecycle updates are trigger-blocked.
+- `/book/[slug]` reads only through `get_public_business(text)`, a security-definer function with a fixed empty `search_path` and an explicit public JSON projection. Only published, non-suspended organizations are returned; internal IDs, memberships, contacts, notes, policies, and audit data are absent.
+- Unpublish preserves onboarding data and immediately removes the organization from the public projection. Republish reruns the same transactional readiness checks.
