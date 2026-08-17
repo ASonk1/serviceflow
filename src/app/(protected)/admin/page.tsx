@@ -1,0 +1,1 @@
+import { ProtectedPlaceholder } from "@/components/auth/protected-placeholder"; export const metadata = { title: "Platform administration" }; export default function Page() { return <ProtectedPlaceholder eyebrow="Platform administration" title="The admin boundary is in place" />; }

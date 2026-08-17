@@ -49,6 +49,10 @@ The roadmap assumes one developer. Estimates are deliberately omitted because qu
 
 ## 5. Phase 2 — Supabase foundation, schema core, and authentication
 
+Phase 2 begins with a bounded Phase 2A foundation slice: compatible dependencies and scripts, value-free environment documentation and typed public/server validation, local Supabase configuration, and recorded architecture/schema decisions. Phase 2A intentionally creates no application tables, RLS policies, authentication pages, or protected routes.
+
+Phase 2B adds only the core PostgreSQL schema, deny-by-default RLS authorization foundation, deterministic fictional fixtures, generated database types, and local pgTAP integration coverage. Application authentication and protected Next.js surfaces remain deferred to a later Phase 2 slice.
+
 ### Deliverables
 
 - Add local/test Supabase workflow, migration directory, generated types, and separated browser/user-server/service-role clients.

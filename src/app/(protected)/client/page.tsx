@@ -1,0 +1,1 @@
+import { ProtectedPlaceholder } from "@/components/auth/protected-placeholder"; export const metadata = { title: "Client account" }; export default function Page() { return <ProtectedPlaceholder eyebrow="Client account" title="Your client destination is ready" />; }

@@ -8,7 +8,7 @@ Conventions:
 
 - Primary keys are UUIDs generated in PostgreSQL. Public confirmation references are separate opaque random values.
 - All timestamps representing instants are `timestamptz` in UTC. Weekly recurring wall-clock values use `time` plus weekday and are interpreted in the organization IANA timezone.
-- Money is integer minor units (`bigint` where aggregation warrants it) plus ISO 4217 currency code.
+- Money is integer minor units (`bigint` where aggregation warrants it) plus an ISO 4217 currency code restricted in v1 to `RON`, `EUR`, `USD`, or `GBP`.
 - Tenant-owned tables carry non-null `organization_id`; composite foreign keys are preferred where they prevent cross-tenant relationships.
 - Mutable records have `created_at`, `updated_at`; actors are included where useful. Historical/domain event records are append-only.
 - Archive/deactivate is preferred to delete for referenced business data. Authentication deletion uses an explicit privacy workflow.
@@ -41,7 +41,7 @@ Every tenant-to-tenant relationship must include or validate `organization_id`. 
 
 ### `user_profiles`
 
-Application extension of `auth.users`.
+Application extension of `auth.users`. A minimal trigger on `auth.users` creates this row and assigns safe defaults; it must not copy caller-controlled platform-role or status metadata.
 
 | Column | Type | Rules |
 |---|---|---|
@@ -86,7 +86,7 @@ Constraints/indexes:
 |---|---|---|
 | `id` | uuid PK | generated |
 | `organization_id` | uuid FK | organizations, restrict delete |
-| `user_id` | uuid FK | auth.users, restrict/control delete |
+| `user_id` | uuid nullable FK | auth.users, null while an invitation is pending; restrict/control delete once linked |
 | `role` | text | `owner` or `staff` |
 | `status` | text | `invited`, `active`, `inactive` |
 | `invited_email` | text nullable | canonical email for pending invitation |
@@ -173,7 +173,7 @@ Primary key `(service_id, staff_profile_id)`; composite FKs `(organization_id, s
 | Column | Type | Rules |
 |---|---|---|
 | `id`, `organization_id`, `staff_profile_id` | uuid | tenant-consistent |
-| `weekday` | smallint | 0-6 with documented Sunday/Monday convention |
+| `weekday` | smallint | ISO weekday 1-7, Monday through Sunday |
 | `start_local`, `end_local` | time | start < end; windows cannot cross midnight in v1 |
 | `effective_from`, `effective_until` | date nullable | optional bounded schedule versions |
 | `is_active` | boolean | state |
@@ -230,6 +230,8 @@ A tenant’s view of a client; one user can have separate records at different o
 | timestamps | timestamptz | standard |
 
 Constraints/indexes: unique `(organization_id, email_normalized)` for v1 identity model; unique partial `(organization_id, user_id) where user_id is not null`; `(organization_id, last_booked_at desc, id)`. Linking requires verified email or verified capability; never trust an entered email to claim history.
+
+Phase 2 exposes linked client data through the narrow `get_my_client_records()` function, which omits owner notes. Authenticated owners cannot directly set or change `user_id`; a later verified claim/link function must own that transition.
 
 ### `appointments`
 
@@ -363,7 +365,7 @@ Append-only important-action trail, not full observability.
 | `ip_hash` | text nullable | salted privacy-preserving abuse trace |
 | `created_at` | timestamptz | immutable |
 
-Indexes: `(organization_id, created_at desc, id)`, `(actor_user_id, created_at desc)`, `(target_type, target_id, created_at desc)`, and platform partial index for null organization. Owners select safe tenant rows; only trusted functions insert; no ordinary update/delete.
+Indexes: `(organization_id, created_at desc, id)`, `(actor_user_id, created_at desc)`, `(target_type, target_id, created_at desc)`, and platform partial index for null organization. Owners select safe tenant rows; only the unexposed private audit writer, called by future trusted domain functions, inserts application events. Ordinary roles and the service role cannot insert/update/delete audit rows directly.
 
 ### Optional `scheduled_job_runs`
 
