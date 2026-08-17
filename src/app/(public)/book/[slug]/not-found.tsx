@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function NotFound(){return <main id="main-content" className="not-found-page"><section className="not-found-card"><p className="eyebrow">Business unavailable</p><h1>This booking page is not public.</h1><p>The address may be incorrect, or the business may still be preparing its profile.</p><Link className="button button-ink" href="/">Return to ServiceFlow</Link></section></main>}

@@ -1,0 +1,41 @@
+begin;
+set local search_path=public,extensions;
+select plan(24);
+select is((select public from storage.buckets where id='serviceflow-public-media'),true,'public presentation bucket exists');
+select is((select file_size_limit from storage.buckets where id='serviceflow-public-media'),2097152::bigint,'bucket limit is two megabytes');
+select is((select allowed_mime_types from storage.buckets where id='serviceflow-public-media'),array['image/jpeg','image/png','image/webp']::text[],'bucket MIME allowlist is narrow');
+update auth.users set email_confirmed_at=now() where id in ('00000000-0000-4000-8000-000000000101','00000000-0000-4000-8000-000000000102','00000000-0000-4000-8000-000000000201','00000000-0000-4000-8000-000000000203');
+set local role authenticated;
+select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000101","role":"authenticated"}',true);
+insert into storage.objects(bucket_id,name,owner_id,metadata) values
+ ('serviceflow-public-media','organizations/10000000-0000-4000-8000-000000000001/branding/20000000-0000-4000-8000-000000000001.png',auth.uid(),'{"mimetype":"image/png","size":68}'),
+ ('serviceflow-public-media','organizations/10000000-0000-4000-8000-000000000001/branding/20000000-0000-4000-8000-000000000002.webp',auth.uid(),'{"mimetype":"image/webp","size":80}'),
+ ('serviceflow-public-media','organizations/10000000-0000-4000-8000-000000000001/staff/13000000-0000-4000-8000-000000000102/20000000-0000-4000-8000-000000000003.jpg',auth.uid(),'{"mimetype":"image/jpeg","size":90}');
+reset role;set local role service_role;
+select is((select count(*) from storage.objects where bucket_id='serviceflow-public-media'),3::bigint,'owner inserts correctly scoped media');
+set local role authenticated;
+select throws_ok($$insert into storage.objects(bucket_id,name,metadata) values('serviceflow-public-media','organizations/20000000-0000-4000-8000-000000000001/branding/20000000-0000-4000-8000-000000000004.png','{"mimetype":"image/png","size":68}')$$,'42501',null,'forged organization path rejected');
+select throws_ok($$insert into storage.objects(bucket_id,name,metadata) values('serviceflow-public-media','organizations/10000000-0000-4000-8000-000000000001/staff/23000000-0000-4000-8000-000000000001/20000000-0000-4000-8000-000000000004.png','{"mimetype":"image/png","size":68}')$$,'42501',null,'forged staff path rejected');
+select throws_ok($$insert into storage.objects(bucket_id,name,metadata) values('serviceflow-public-media','organizations/10000000-0000-4000-8000-000000000001/branding/20000000-0000-4000-8000-000000000005.svg','{"mimetype":"image/svg+xml","size":68}')$$,'42501',null,'unsupported path and MIME rejected');
+select throws_ok($$select public.set_organization_logo('10000000-0000-4000-8000-000000000001','organizations/10000000-0000-4000-8000-000000000001/branding/20000000-0000-4000-8000-000000000099.png')$$,'22023','invalid or missing logo object','missing object cannot be attached');
+select is(public.set_organization_logo('10000000-0000-4000-8000-000000000001','organizations/10000000-0000-4000-8000-000000000001/branding/20000000-0000-4000-8000-000000000001.png'),null::text,'valid logo attaches');
+select is(public.set_organization_logo('10000000-0000-4000-8000-000000000001','organizations/10000000-0000-4000-8000-000000000001/branding/20000000-0000-4000-8000-000000000002.webp'),'organizations/10000000-0000-4000-8000-000000000001/branding/20000000-0000-4000-8000-000000000001.png','logo replacement returns previous path');
+select is(public.set_organization_logo('10000000-0000-4000-8000-000000000001',null),'organizations/10000000-0000-4000-8000-000000000001/branding/20000000-0000-4000-8000-000000000002.webp','logo removes idempotently');
+select is(public.set_staff_avatar('10000000-0000-4000-8000-000000000001','13000000-0000-4000-8000-000000000102','organizations/10000000-0000-4000-8000-000000000001/staff/13000000-0000-4000-8000-000000000102/20000000-0000-4000-8000-000000000003.jpg'),null::text,'valid avatar attaches');
+select is(public.set_staff_avatar('10000000-0000-4000-8000-000000000001','13000000-0000-4000-8000-000000000102',null),'organizations/10000000-0000-4000-8000-000000000001/staff/13000000-0000-4000-8000-000000000102/20000000-0000-4000-8000-000000000003.jpg','avatar removes');
+select is((select status from organizations where id='10000000-0000-4000-8000-000000000001'),'published','media changes do not affect publication');
+select ok((get_public_business('alpha-wellness-lab')->'logoPath')='null'::jsonb,'public projection exposes optional logo only');
+select ok(not(get_public_business('alpha-wellness-lab') ?| array['id','organizationId','email','memberships']),'public projection stays narrow');
+select ok((select count(*)>=4 from audit_logs where organization_id='10000000-0000-4000-8000-000000000001' and action in ('organization.logo_updated','organization.logo_removed','staff.avatar_updated','staff.avatar_removed') and changes='{}'),'media audit events omit paths and sensitive metadata');
+select throws_ok($$update public.organizations set logo_path='organizations/10000000-0000-4000-8000-000000000001/branding/20000000-0000-4000-8000-000000000001.png' where id='10000000-0000-4000-8000-000000000001'$$,'42501','media references require the validated media workflow','direct browser reference update denied');
+select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000201","role":"authenticated"}',true);
+select throws_ok($$insert into storage.objects(bucket_id,name,metadata) values('serviceflow-public-media','organizations/10000000-0000-4000-8000-000000000001/branding/20000000-0000-4000-8000-000000000006.png','{"mimetype":"image/png","size":68}')$$,'42501',null,'unrelated owner cannot upload');
+select throws_ok($$select public.set_organization_logo('10000000-0000-4000-8000-000000000001',null)$$,'42501','organization not found','unrelated owner cannot mutate reference');
+select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000102","role":"authenticated"}',true);
+select throws_ok($$insert into storage.objects(bucket_id,name,metadata) values('serviceflow-public-media','organizations/10000000-0000-4000-8000-000000000001/branding/20000000-0000-4000-8000-000000000007.png','{"mimetype":"image/png","size":68}')$$,'42501',null,'staff cannot upload public media');
+select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000203","role":"authenticated"}',true);
+select throws_ok($$insert into storage.objects(bucket_id,name,metadata) values('serviceflow-public-media','organizations/20000000-0000-4000-8000-000000000001/branding/20000000-0000-4000-8000-000000000008.png','{"mimetype":"image/png","size":68}')$$,'42501',null,'client cannot upload public media');
+reset role;set local role anon;
+select throws_ok($$insert into storage.objects(bucket_id,name,metadata) values('serviceflow-public-media','organizations/10000000-0000-4000-8000-000000000001/branding/20000000-0000-4000-8000-000000000009.png','{"mimetype":"image/png","size":68}')$$,'42501',null,'anonymous cannot upload');
+select is(get_public_business('draft-demo'),null::jsonb,'draft remains outside public projection');
+select * from finish();rollback;

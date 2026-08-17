@@ -87,6 +87,8 @@ Rules:
 4. The owner can save progress and resume. The organization remains `draft` and unbookable until required data exists.
 5. Publishing makes `/book/[slug]` available. The owner sees a checklist and preview.
 
+Phase delivery note: before the Phase 5 booking engine is implemented, the published route is an informational public profile only. It displays allowlisted business, staff, service, and weekly-hours data and clearly disables interactive booking rather than simulating an appointment.
+
 ### 6.3 Owner operations
 
 1. The owner sees today/upcoming appointments, status summaries, recent activity, and setup alerts.
@@ -155,6 +157,7 @@ Rules:
 - Currency amounts use integer minor units; durations are bounded positive minutes.
 - Services cannot be hard-deleted once referenced by an appointment. Archived services are not publicly bookable.
 - Staff profiles can be public/private and contain display name, biography, optional avatar, and active state.
+- Organization logos and staff avatars are optional public presentation assets. They use generated tenant-scoped object names, an image-only 2 MB public bucket, authenticated owner mutation policies, and validated stored object paths; their absence never blocks publication.
 - Only active membership + active staff profile + active assignment can receive new bookings.
 
 ### 7.5 Availability and blocked time

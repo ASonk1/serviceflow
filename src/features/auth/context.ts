@@ -16,8 +16,9 @@ export async function getAuthContext(): Promise<AuthContext | null> {
   const candidates = memberships ?? [];
   const organizationIds = candidates.map((membership) => membership.organization_id);
   const { data: organizations } = organizationIds.length ? await supabase.from("organizations").select("id,status").in("id", organizationIds) : { data: [] };
-  const operational = new Set((organizations ?? []).filter((organization) => organization.status !== "suspended").map((organization) => organization.id));
+  const operational = new Set((organizations ?? []).filter((organization) => organization.status !== "suspended" && organization.status !== "draft").map((organization) => organization.id));
+  const drafts = new Set((organizations ?? []).filter((organization) => organization.status === "draft").map((organization) => organization.id));
   const activeMemberships = candidates.filter((membership) => operational.has(membership.organization_id) && (membership.role === "owner" || membership.role === "staff")).map((membership) => ({ organizationId: membership.organization_id, role: membership.role as "owner" | "staff" }));
-  const facts = { platformAdmin: profile?.platform_role === "platform_admin" && profile.status === "active", activeMembership: activeMemberships.length > 0, linkedClient: Boolean(clientRows?.length), emailVerified: Boolean(user.email_confirmed_at) };
+  const facts = { platformAdmin: profile?.platform_role === "platform_admin" && profile.status === "active", activeMembership: activeMemberships.length > 0, resumableDraft: candidates.some((membership) => membership.role === "owner" && drafts.has(membership.organization_id)), linkedClient: Boolean(clientRows?.length), emailVerified: Boolean(user.email_confirmed_at) };
   return { userId: user.id, ...facts, activeMemberships, destination: resolveDestination(facts) };
 }

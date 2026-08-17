@@ -119,6 +119,18 @@ One-to-one with organization.
 | `policy_text` | text nullable | bounded public policy |
 | timestamps | timestamptz | standard |
 
+### `onboarding_progress`
+
+One row per draft organization. It stores nullable completion timestamps for `business_identity`, `location`, `booking_policies`, `staff_profile`, `service`, `availability`, `review`, and `publish`. A check constraint enforces sequence order; there is no arbitrary browser-authored JSON state. RLS permits only an active owner to read the row, while writes are limited to authenticated onboarding functions that derive the caller from `auth.uid()`. The first null timestamp is the deterministic resume point. `organizations.onboarding_step` is retained as a display hint only and is never authoritative.
+
+`start_owner_onboarding()` serializes starts per authenticated user and atomically creates or resolves the draft organization, default settings, active owner membership, and progress row. Step functions accept an organization identifier only as a resource target, re-check that the caller is its verified active draft owner, validate persisted values, and advance progress in the same transaction.
+
+Phase 3B adds nullable composite foreign-key references from progress to the authoritative onboarding `staff_profile_id` and `service_id`. These make retries update the same records and prevent cross-tenant references. Completion timestamps remain ordered and can be written only by validated functions.
+
+Phase 3C uses the existing nullable `organizations.logo_path` and `staff_profiles.avatar_path` columns only for validated object names in the public `serviceflow-public-media` bucket. Paths are generated as `organizations/<organization-id>/branding/<uuid>.<safe-extension>` or `organizations/<organization-id>/staff/<staff-profile-id>/<uuid>.<safe-extension>`. Authenticated rows cannot set these references directly: fixed-search-path RPCs derive `auth.uid()`, require a verified active owner and a non-suspended tenant, validate the entity relationship and live storage object metadata, then attach or clear the path and write a redacted audit event.
+
+The bucket is intentionally public because every object it accepts is presentation media destined for anonymous profiles. Its bucket configuration and narrow policies allow only JPEG, PNG, or WebP files from 1 byte through 2 MB. Insert/update/delete policies apply only to this bucket and validate the complete tenant/staff prefix; anonymous, client, staff, suspended, and unrelated-owner mutation remains denied. The public business projection adds only nullable logo/avatar paths and never exposes object ownership metadata or internal entity identifiers.
+
 ## 4. Catalog and staffing
 
 ### `services`
@@ -147,6 +159,7 @@ Indexes: `(organization_id, status, name, id)`, optional normalized/trigram name
 | `membership_id` | uuid | unique FK to same-tenant active owner/staff membership |
 | `display_name` | text | public name |
 | `bio` | text nullable | bounded |
+| `job_title` | text nullable | bounded public role/title |
 | `avatar_path` | text nullable | storage path |
 | `is_public` | boolean | public booking visibility |
 | `status` | text | `active`, `inactive` |
@@ -180,6 +193,8 @@ Primary key `(service_id, staff_profile_id)`; composite FKs `(organization_id, s
 | timestamps | timestamptz | standard |
 
 Indexes: `(organization_id, staff_profile_id, weekday, is_active)`. An exclusion constraint on staff, weekday/effective dates/local time ranges is preferred; otherwise the write function rejects overlapping active windows. Overnight windows are represented as two rows.
+
+During onboarding, `replace_onboarding_availability` accepts one to 35 intervals, requires five-minute granularity, rejects unknown fields, duplicates and overlaps, and validates the full replacement before deleting the prior schedule. IDs are deterministic for the same organization/staff/day/time tuple.
 
 ### `blocked_times`
 

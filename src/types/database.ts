@@ -187,6 +187,76 @@ export type Database = {
           },
         ]
       }
+      onboarding_progress: {
+        Row: {
+          availability_completed_at: string | null
+          booking_policies_completed_at: string | null
+          business_identity_completed_at: string | null
+          created_at: string
+          location_completed_at: string | null
+          organization_id: string
+          publish_completed_at: string | null
+          review_completed_at: string | null
+          service_completed_at: string | null
+          service_id: string | null
+          staff_profile_completed_at: string | null
+          staff_profile_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          availability_completed_at?: string | null
+          booking_policies_completed_at?: string | null
+          business_identity_completed_at?: string | null
+          created_at?: string
+          location_completed_at?: string | null
+          organization_id: string
+          publish_completed_at?: string | null
+          review_completed_at?: string | null
+          service_completed_at?: string | null
+          service_id?: string | null
+          staff_profile_completed_at?: string | null
+          staff_profile_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          availability_completed_at?: string | null
+          booking_policies_completed_at?: string | null
+          business_identity_completed_at?: string | null
+          created_at?: string
+          location_completed_at?: string | null
+          organization_id?: string
+          publish_completed_at?: string | null
+          review_completed_at?: string | null
+          service_completed_at?: string | null
+          service_id?: string | null
+          staff_profile_completed_at?: string | null
+          staff_profile_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_progress_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_progress_service_fk"
+            columns: ["organization_id", "service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "onboarding_progress_staff_fk"
+            columns: ["organization_id", "staff_profile_id"]
+            isOneToOne: false
+            referencedRelation: "staff_profiles"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
       organization_memberships: {
         Row: {
           accepted_at: string | null
@@ -472,6 +542,7 @@ export type Database = {
           display_name: string
           id: string
           is_public: boolean
+          job_title: string | null
           membership_id: string
           organization_id: string
           status: string
@@ -484,6 +555,7 @@ export type Database = {
           display_name: string
           id?: string
           is_public?: boolean
+          job_title?: string | null
           membership_id: string
           organization_id: string
           status?: string
@@ -496,6 +568,7 @@ export type Database = {
           display_name?: string
           id?: string
           is_public?: boolean
+          job_title?: string | null
           membership_id?: string
           organization_id?: string
           status?: string
@@ -606,6 +679,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      complete_onboarding_review: {
+        Args: { target_org_id: string }
+        Returns: undefined
+      }
       get_my_client_records: {
         Args: never
         Returns: {
@@ -619,6 +696,85 @@ export type Database = {
           phone: string
           updated_at: string
         }[]
+      }
+      get_public_business: { Args: { public_slug: string }; Returns: Json }
+      publish_organization: { Args: { target_org_id: string }; Returns: string }
+      replace_onboarding_availability: {
+        Args: { intervals: Json; target_org_id: string }
+        Returns: undefined
+      }
+      save_onboarding_booking_policies: {
+        Args: {
+          cancellation_minutes: number
+          guests_enabled: boolean
+          horizon_days: number
+          interval_minutes: number
+          lead_minutes: number
+          reschedule_minutes: number
+          target_org_id: string
+          terms?: string
+        }
+        Returns: undefined
+      }
+      save_onboarding_business_identity: {
+        Args: {
+          business_name: string
+          public_slug: string
+          target_org_id: string
+        }
+        Returns: undefined
+      }
+      save_onboarding_location: {
+        Args: {
+          address1?: string
+          address2?: string
+          city_name: string
+          country: string
+          currency_code: string
+          postal?: string
+          region_name?: string
+          target_org_id: string
+          timezone_name: string
+        }
+        Returns: undefined
+      }
+      save_onboarding_service: {
+        Args: {
+          service_buffer: number
+          service_description: string
+          service_duration: number
+          service_name: string
+          service_price_minor: number
+          target_org_id: string
+        }
+        Returns: string
+      }
+      save_onboarding_staff_profile: {
+        Args: {
+          public_visible?: boolean
+          staff_bio?: string
+          staff_job_title?: string
+          staff_name: string
+          target_org_id: string
+        }
+        Returns: string
+      }
+      set_organization_logo: {
+        Args: { object_path?: string; target_org_id: string }
+        Returns: string
+      }
+      set_staff_avatar: {
+        Args: {
+          object_path?: string
+          target_org_id: string
+          target_staff_id: string
+        }
+        Returns: string
+      }
+      start_owner_onboarding: { Args: never; Returns: string }
+      unpublish_organization: {
+        Args: { target_org_id: string }
+        Returns: undefined
       }
     }
     Enums: {

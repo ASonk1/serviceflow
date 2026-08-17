@@ -143,6 +143,8 @@ Use Server Actions for first-party form mutations: onboarding, service/staff/set
 
 Server Actions use POST but remain directly invokable endpoints. Hiding a button is never authorization.
 
+Owner onboarding uses a user-session Supabase client, never the service-role client. Its start RPC is transactionally idempotent and takes no user ID; it locks on `auth.uid()` before resolving or creating a draft. Each implemented step has a focused Zod schema and a matching security-definer RPC with a fixed empty `search_path`. Progress is a constrained relational row of completion timestamps, and the server always resumes from the first incomplete persisted step rather than trusting a route or browser step number. Active draft ownership resolves to `/onboarding`; only non-draft active tenant membership resolves to the owner dashboard.
+
 ### Route Handlers
 
 Use Route Handlers where an HTTP contract is required:
@@ -365,3 +367,24 @@ Only `NEXT_PUBLIC_*` values may enter browser bundles, and those are frozen at b
 - Pending staff invitations may have a null `user_id` until verified acceptance. Platform administrators use narrow audited functions or views rather than unrestricted tenant-table access.
 - Reserved organization slugs are `admin`, `api`, `auth`, `dashboard`, `client`, `demo`, `features`, `login`, `onboarding`, `privacy`, `sign-in`, `sign-up`, `support`, `terms`, and `www`.
 - Local Supabase through Docker is required for development and database integration tests. Seeds must be deterministic and fictional; real customer data and production credentials are prohibited in every demo environment.
+
+## 17. Phase 3A onboarding decisions
+
+- Phase 3A implements business identity, location/regional settings, and booking policies. Staff profile, service, availability, review, and publish remain represented but incomplete for Phase 3B.
+- Draft organizations are private and unbookable. Platform administrators receive no implicit tenant-table policy; any future support access remains narrow and audited.
+- Slugs are normalized in Zod and PostgreSQL, checked against the documented reserved list, and protected by the existing unique database index.
+
+## 18. Phase 3B publication decisions
+
+- The first onboarding staff profile is an idempotent public owner-operator profile linked to the authenticated owner membership. The progress row stores the authoritative first staff and service identifiers; callers never choose membership, user, currency, staff, or service relationships.
+- Weekly availability is submitted as a bounded transient array, validated completely in PostgreSQL, and replaced in one transaction. Stable UUIDs are derived from tenant, staff, weekday, and interval values; the existing exclusion constraint remains the final overlap backstop.
+- Review and publication readiness are recalculated from persisted relational data. Publication locks the organization, checks every identity/settings/staff/service/assignment/availability invariant, changes lifecycle state, marks progress, and writes an audit event atomically. Direct authenticated lifecycle updates are trigger-blocked.
+- `/book/[slug]` reads only through `get_public_business(text)`, a security-definer function with a fixed empty `search_path` and an explicit public JSON projection. Only published, non-suspended organizations are returned; internal IDs, memberships, contacts, notes, policies, and audit data are absent.
+- Unpublish preserves onboarding data and immediately removes the organization from the public projection. Republish reruns the same transactional readiness checks.
+
+## 19. Phase 3C public media decisions
+
+- `serviceflow-public-media` is a deliberately public Supabase Storage bucket limited to JPEG, PNG, and WebP images up to 2 MB. Generated UUID filenames sit under validated organization and staff prefixes; original filenames and external URLs are never persisted.
+- Uploads use the authenticated user client and bucket-specific RLS. After upload, a fixed-search-path database function verifies the active owner, tenant/entity relationship, exact path prefix, object existence, MIME metadata, and size before persisting the object path. Logo/avatar remain optional and do not participate in onboarding progress or publication readiness.
+- Replacement uploads the new version, attaches it, and only then attempts to delete the previous object. A failed attach cleans up the new object; a failed old-object cleanup can leave an unreferenced object but never a broken persisted reference. Removal clears the reference before best-effort object deletion.
+- Anonymous pages construct Storage public URLs only from validated paths returned by the narrow published-business projection. Draft/unpublished/suspended tenants remain absent. Audit events record only the media action, actor, and target—not paths, URLs, filenames, binary data, or credentials.
