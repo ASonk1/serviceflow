@@ -1,0 +1,2 @@
+"use client";
+export default function ErrorState({reset}:{error:Error;reset:()=>void}){return <main id="main-content" className="dashboard-foundation service-management"><p className="eyebrow">Service catalog</p><h1>Services could not load</h1><p>Your data was not changed. Try loading this owner-only page again.</p><button className="button button-primary" onClick={reset}>Try again</button></main>}

@@ -1,0 +1,1 @@
+export default function Loading(){return <main id="main-content" className="dashboard-foundation service-management" aria-busy="true"><p className="eyebrow">Service catalog</p><h1>Loading services…</h1><div className="service-loading" aria-hidden="true"/><div className="service-loading" aria-hidden="true"/></main>}

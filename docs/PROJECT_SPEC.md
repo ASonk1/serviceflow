@@ -159,6 +159,7 @@ Phase delivery note: before the Phase 5 booking engine is implemented, the publi
 - Staff profiles can be public/private and contain display name, biography, optional avatar, and active state.
 - Organization logos and staff avatars are optional public presentation assets. They use generated tenant-scoped object names, an image-only 2 MB public bucket, authenticated owner mutation policies, and validated stored object paths; their absence never blocks publication.
 - Only active membership + active staff profile + active assignment can receive new bookings.
+- Phase 4A owners manage services at `/dashboard/services`: creation and edits derive currency from the organization, lifecycle uses archive/activate rather than deletion, and assignments accept only same-tenant active public staff backed by active verified memberships. Search/filter/pagination, invitations, staff editing, and schedule editing remain later Phase 4 slices.
 
 ### 7.5 Availability and blocked time
 
