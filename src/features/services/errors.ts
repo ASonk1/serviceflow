@@ -1,0 +1,2 @@
+export type ServiceOperation="create"|"update"|"status"|"assignment";
+export function safeServiceError(operation:ServiceOperation,error:unknown){void error;const messages:Record<ServiceOperation,string>={create:"The service could not be created.",update:"The service could not be updated.",status:"The service status could not be changed.",assignment:"The staff assignment could not be changed."};return messages[operation]}

@@ -151,6 +151,8 @@ The bucket is intentionally public because every object it accepts is presentati
 
 Indexes: `(organization_id, status, name, id)`, optional normalized/trigram name search after measurement. Unique `(organization_id, id)` supports composite FKs. Referenced services cannot be deleted.
 
+Phase 4A service mutations use `create_managed_service`, `update_managed_service`, `set_managed_service_status`, and `set_managed_service_staff`. Each fixed-search-path security-definer function derives the verified active owner through `auth.uid()`, resolves organization and currency server-side, locks target rows where appropriate, and writes a redacted audit event. An invoker trigger blocks direct authenticated service and assignment writes, while existing trusted onboarding functions remain compatible. Assignment eligibility requires a same-tenant active public profile backed by an active verified owner/staff membership. Assignment retries update the existing `(service_id, staff_profile_id)` row rather than duplicating it.
+
 ### `staff_profiles`
 
 | Column | Type | Rules |

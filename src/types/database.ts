@@ -683,6 +683,17 @@ export type Database = {
         Args: { target_org_id: string }
         Returns: undefined
       }
+      create_managed_service: {
+        Args: {
+          service_buffer: number
+          service_description: string
+          service_duration: number
+          service_name: string
+          service_price_minor: number
+          target_org_id: string
+        }
+        Returns: string
+      }
       get_my_client_records: {
         Args: never
         Returns: {
@@ -759,6 +770,18 @@ export type Database = {
         }
         Returns: string
       }
+      set_managed_service_staff: {
+        Args: {
+          assigned: boolean
+          target_service_id: string
+          target_staff_id: string
+        }
+        Returns: boolean
+      }
+      set_managed_service_status: {
+        Args: { desired_status: string; target_service_id: string }
+        Returns: string
+      }
       set_organization_logo: {
         Args: { object_path?: string; target_org_id: string }
         Returns: string
@@ -775,6 +798,17 @@ export type Database = {
       unpublish_organization: {
         Args: { target_org_id: string }
         Returns: undefined
+      }
+      update_managed_service: {
+        Args: {
+          service_buffer: number
+          service_description: string
+          service_duration: number
+          service_name: string
+          service_price_minor: number
+          target_service_id: string
+        }
+        Returns: string
       }
     }
     Enums: {
