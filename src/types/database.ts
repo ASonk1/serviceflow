@@ -257,6 +257,59 @@ export type Database = {
           },
         ]
       }
+      organization_invitations: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          email_normalized: string
+          expires_at: string
+          id: string
+          invited_by: string
+          last_sent_at: string
+          organization_id: string
+          revoked_at: string | null
+          role: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          email_normalized: string
+          expires_at: string
+          id?: string
+          invited_by: string
+          last_sent_at?: string
+          organization_id: string
+          revoked_at?: string | null
+          role?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          email_normalized?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string
+          last_sent_at?: string
+          organization_id?: string
+          revoked_at?: string | null
+          role?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_invitations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_memberships: {
         Row: {
           accepted_at: string | null
@@ -679,6 +732,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_team_invitation: {
+        Args: { target_invitation_id: string }
+        Returns: string
+      }
       complete_onboarding_review: {
         Args: { target_org_id: string }
         Returns: undefined
@@ -692,6 +749,10 @@ export type Database = {
           service_price_minor: number
           target_org_id: string
         }
+        Returns: string
+      }
+      create_team_invitation: {
+        Args: { invite_email: string; target_org_id: string }
         Returns: string
       }
       get_my_client_records: {
@@ -708,11 +769,24 @@ export type Database = {
           updated_at: string
         }[]
       }
+      get_my_team_invitation: {
+        Args: { target_invitation_id: string }
+        Returns: Json
+      }
+      get_owner_team: { Args: { target_org_id: string }; Returns: Json }
       get_public_business: { Args: { public_slug: string }; Returns: Json }
       publish_organization: { Args: { target_org_id: string }; Returns: string }
       replace_onboarding_availability: {
         Args: { intervals: Json; target_org_id: string }
         Returns: undefined
+      }
+      resend_team_invitation: {
+        Args: { target_invitation_id: string }
+        Returns: string
+      }
+      revoke_team_invitation: {
+        Args: { target_invitation_id: string }
+        Returns: string
       }
       save_onboarding_booking_policies: {
         Args: {
@@ -794,6 +868,10 @@ export type Database = {
         }
         Returns: string
       }
+      set_team_member_status: {
+        Args: { desired_status: string; target_membership_id: string }
+        Returns: string
+      }
       start_owner_onboarding: { Args: never; Returns: string }
       unpublish_organization: {
         Args: { target_org_id: string }
@@ -807,6 +885,17 @@ export type Database = {
           service_name: string
           service_price_minor: number
           target_service_id: string
+        }
+        Returns: string
+      }
+      update_team_member_profile: {
+        Args: {
+          expected_updated_at: string
+          profile_bio: string
+          profile_display_name: string
+          profile_is_public: boolean
+          profile_job_title: string
+          target_membership_id: string
         }
         Returns: string
       }

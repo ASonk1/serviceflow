@@ -9,4 +9,4 @@ export async function proxy(request: NextRequest) {
   }
   response.headers.set("Cache-Control", "private, no-cache, no-store, must-revalidate, max-age=0"); return response;
 }
-export const config = { matcher: ["/auth/:path*", "/dashboard/:path*", "/client/:path*", "/admin/:path*", "/onboarding/:path*"] };
+export const config = { matcher: ["/auth/:path*", "/dashboard/:path*", "/client/:path*", "/admin/:path*", "/onboarding/:path*", "/team/:path*"] };

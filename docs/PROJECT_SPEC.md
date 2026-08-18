@@ -160,6 +160,7 @@ Phase delivery note: before the Phase 5 booking engine is implemented, the publi
 - Organization logos and staff avatars are optional public presentation assets. They use generated tenant-scoped object names, an image-only 2 MB public bucket, authenticated owner mutation policies, and validated stored object paths; their absence never blocks publication.
 - Only active membership + active staff profile + active assignment can receive new bookings.
 - Phase 4A owners manage services at `/dashboard/services`: creation and edits derive currency from the organization, lifecycle uses archive/activate rather than deletion, and assignments accept only same-tenant active public staff backed by active verified memberships. Search/filter/pagination, invitations, staff editing, and schedule editing remain later Phase 4 slices.
+- Phase 4B owners manage members and invitation history at `/dashboard/team`. Invitations grant only `staff`, expire after seven days, accept only for the verified invited email, and retain accepted/expired/revoked history. Deactivation retains the membership/profile, disables active service assignments, and reactivation never silently restores assignments. Weekly availability and blocked time remain Phase 4C.
 
 ### 7.5 Availability and blocked time
 
