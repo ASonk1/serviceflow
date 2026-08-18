@@ -102,6 +102,12 @@ Constraints/indexes:
 - trigger/transactional function prevents deactivating/demoting the final active owner;
 - invitation acceptance verifies authenticated email and atomically links `user_id`.
 
+Phase 4B moves new invitation lifecycle state into `organization_invitations`; membership rows represent accepted members. Managed-write triggers require authenticated membership/profile changes to use audited domain functions.
+
+### `organization_invitations`
+
+Owner-created staff invitations retain normalized email, inviter, seven-day expiry, last-send time, and `pending`, `accepted`, `expired`, or `revoked` state. A partial unique index permits only one pending invitation per organization/email. Auth email credentials remain in Supabase Auth and are never stored in plaintext application tables. Acceptance locks the invitation, requires the current verified Auth email, links/creates the staff membership and profile transactionally, and is safe to retry.
+
 ### `organization_settings`
 
 One-to-one with organization.

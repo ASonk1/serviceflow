@@ -42,6 +42,9 @@ values
   ('22000000-0000-4000-8000-000000000202', '20000000-0000-4000-8000-000000000001', '00000000-0000-4000-8000-000000000202', 'staff', 'active', null, '00000000-0000-4000-8000-000000000201', '2026-01-02 09:00:00+00'),
   ('33000000-0000-4000-8000-000000000301', '30000000-0000-4000-8000-000000000001', '00000000-0000-4000-8000-000000000301', 'owner', 'active', null, null, '2026-01-01 09:00:00+00');
 
+insert into public.organization_invitations (id, organization_id, email_normalized, role, status, invited_by, expires_at, last_sent_at)
+values ('18000000-0000-4000-8000-000000000105', '10000000-0000-4000-8000-000000000001', 'pending.alpha@serviceflow.invalid', 'staff', 'pending', '00000000-0000-4000-8000-000000000101', statement_timestamp() + interval '7 days', statement_timestamp());
+
 insert into public.organization_settings (organization_id, slot_interval_minutes, minimum_lead_minutes, booking_horizon_days, policy_text)
 values
   ('10000000-0000-4000-8000-000000000001', 15, 120, 60, 'Fictional Alpha booking policy.'),
