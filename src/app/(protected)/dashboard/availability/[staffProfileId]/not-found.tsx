@@ -1,0 +1,1 @@
+import Link from "next/link";export default function NotFound(){return <main id="main-content" className="dashboard-foundation service-empty"><h1>Schedule not found</h1><p>This profile is inactive, unavailable, or outside your organization.</p><Link className="button button-primary" href="/dashboard/availability">Back to availability</Link></main>}

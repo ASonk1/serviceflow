@@ -204,7 +204,11 @@ Indexes: `(organization_id, staff_profile_id, weekday, is_active)`. An exclusion
 
 During onboarding, `replace_onboarding_availability` accepts one to 35 intervals, requires five-minute granularity, rejects unknown fields, duplicates and overlaps, and validates the full replacement before deleting the prior schedule. IDs are deterministic for the same organization/staff/day/time tuple.
 
+Phase 4C managed functions create, update, and remove individual recurring intervals. They require an active target profile/membership, authorize owner-in-tenant or staff-self access from `auth.uid()`, enforce five-minute granularity and optimistic `updated_at` checks, and rely on the exclusion constraint as the transactional overlap backstop. Direct authenticated writes are rejected by a managed-write trigger.
+
 ### `blocked_times`
+
+Phase 4C stores blocks as absolute UTC instants after server-side IANA timezone conversion. Overlapping rows are intentionally allowed and future availability calculation treats their ranges as a union. Managed functions enforce active tenant access, ordered instants, bounded optional internal labels, and optimistic concurrency. Audit events contain only redacted operation summaries, never the label.
 
 | Column | Type | Rules |
 |---|---|---|

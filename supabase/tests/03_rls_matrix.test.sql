@@ -68,7 +68,7 @@ select is((select count(*) from public.weekly_availability), 1::bigint, 'staff s
 select is((select count(*) from public.blocked_times), 1::bigint, 'staff sees own blocks only');
 select is((select count(*) from public.client_records), 0::bigint, 'staff cannot select private client records');
 select lives_ok($$update public.staff_profiles set bio = 'Updated fictional bio.' where id = '13000000-0000-4000-8000-000000000102'$$, 'staff can update own profile');
-select lives_ok($$insert into public.blocked_times (organization_id, staff_profile_id, starts_at, ends_at, reason, created_by) values ('10000000-0000-4000-8000-000000000001','13000000-0000-4000-8000-000000000102','2026-11-01','2026-11-02','Own fictional block','00000000-0000-4000-8000-000000000102')$$, 'staff can create own block');
+select throws_ok($$insert into public.blocked_times (organization_id, staff_profile_id, starts_at, ends_at, reason, created_by) values ('10000000-0000-4000-8000-000000000001','13000000-0000-4000-8000-000000000102','2026-11-01','2026-11-02','Own fictional block','00000000-0000-4000-8000-000000000102')$$,'42501','schedule changes require a managed operation','staff direct block writes require the managed workflow');
 select results_eq($$update public.service_staff set is_active = false where service_id = '12000000-0000-4000-8000-000000000101' returning 1$$, $$select 1 where false$$, 'staff cannot mutate assignments');
 
 -- Client receives only its linked safe projection; owner notes are absent from the return type.

@@ -740,6 +740,15 @@ export type Database = {
         Args: { target_org_id: string }
         Returns: undefined
       }
+      create_blocked_time: {
+        Args: {
+          target_ends_at: string
+          target_reason?: string
+          target_staff_profile_id: string
+          target_starts_at: string
+        }
+        Returns: string
+      }
       create_managed_service: {
         Args: {
           service_buffer: number
@@ -754,6 +763,23 @@ export type Database = {
       create_team_invitation: {
         Args: { invite_email: string; target_org_id: string }
         Returns: string
+      }
+      create_weekly_availability: {
+        Args: {
+          target_end: string
+          target_staff_profile_id: string
+          target_start: string
+          target_weekday: number
+        }
+        Returns: string
+      }
+      delete_blocked_time: {
+        Args: { expected_updated_at: string; target_block_id: string }
+        Returns: undefined
+      }
+      delete_weekly_availability: {
+        Args: { expected_updated_at: string; target_interval_id: string }
+        Returns: undefined
       }
       get_my_client_records: {
         Args: never
@@ -877,6 +903,16 @@ export type Database = {
         Args: { target_org_id: string }
         Returns: undefined
       }
+      update_blocked_time: {
+        Args: {
+          expected_updated_at: string
+          target_block_id: string
+          target_ends_at: string
+          target_reason: string
+          target_starts_at: string
+        }
+        Returns: undefined
+      }
       update_managed_service: {
         Args: {
           service_buffer: number
@@ -898,6 +934,16 @@ export type Database = {
           target_membership_id: string
         }
         Returns: string
+      }
+      update_weekly_availability: {
+        Args: {
+          expected_updated_at: string
+          target_end: string
+          target_interval_id: string
+          target_start: string
+          target_weekday: number
+        }
+        Returns: undefined
       }
     }
     Enums: {

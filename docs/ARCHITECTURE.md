@@ -395,6 +395,7 @@ Only `NEXT_PUBLIC_*` values may enter browser bundles, and those are frozen at b
 - Client components are limited to forms that need `useActionState`. Server Actions validate strict Zod inputs, re-fetch organization currency, and call narrow PostgreSQL mutations. Currency, organization membership, staff membership, and tenant relationships are never accepted as browser authority.
 - Service and assignment writes are controlled by audited fixed-search-path functions. Direct authenticated table writes are trigger-blocked, services are archived rather than deleted, and retrying status/assignment state is idempotent without duplicate audit events.
 - Phase 4A deliberately provides deterministic ordering and an empty state but no search/filter/pagination. Team invitations and staff editing remain Phase 4B; availability and blocked time remain Phase 4C; complete URL-backed list tooling remains Phase 4D.
+- Phase 4C schedule reads use a server-only DTO loader over existing RLS. Mutations use fixed-search-path security-definer RPCs that derive the actor and tenant from `auth.uid()`, require verified active memberships, active staff profiles, and a published active organization, lock edited rows, and reject stale timestamps. Direct authenticated schedule table writes are trigger-blocked. Recurring clock times remain organization-local; block wall times are converted with the trusted IANA timezone and ambiguous/nonexistent DST values are rejected before UTC persistence. Audit metadata never includes block labels.
 
 ## 21. Phase 4B team-management decisions
 
