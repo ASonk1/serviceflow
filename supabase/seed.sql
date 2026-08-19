@@ -1,6 +1,6 @@
 -- Deterministic local/test-only fixtures. Every identity and business below is fictional.
--- Auth placeholders deliberately have no password. The Alpha owner/staff email identities below
--- allow isolated browser tests to establish their own sessions through the local recovery flow.
+-- Shared Alpha owner/staff placeholders deliberately have no password and are used by legacy
+-- recovery-flow coverage. Phase-specific browser identities use isolated deterministic credentials.
 
 begin;
 
@@ -20,10 +20,16 @@ values
 update auth.users set instance_id='00000000-0000-0000-0000-000000000000',aud='authenticated',role='authenticated',raw_app_meta_data='{"provider":"email","providers":["email"]}',encrypted_password='',email_confirmed_at=statement_timestamp(),confirmation_token='',recovery_token='',email_change='',email_change_token_new='',email_change_token_current='',phone_change='',phone_change_token='',reauthentication_token='',created_at=statement_timestamp(),updated_at=statement_timestamp()
 where id in ('00000000-0000-4000-8000-000000000101','00000000-0000-4000-8000-000000000102');
 
+update auth.users set instance_id='00000000-0000-0000-0000-000000000000',aud='authenticated',role='authenticated',raw_app_meta_data='{"provider":"email","providers":["email"]}',encrypted_password=extensions.crypt('Fictional-phase6a-password-12',extensions.gen_salt('bf')),email_confirmed_at=statement_timestamp(),confirmation_token='',recovery_token='',email_change='',email_change_token_new='',email_change_token_current='',phone_change='',phone_change_token='',reauthentication_token='',created_at=statement_timestamp(),updated_at=statement_timestamp()
+where id='00000000-0000-4000-8000-000000000201';
+
 insert into auth.identities(provider_id,user_id,identity_data,provider,last_sign_in_at,created_at,updated_at)
 values
  ('00000000-0000-4000-8000-000000000101','00000000-0000-4000-8000-000000000101','{"sub":"00000000-0000-4000-8000-000000000101","email":"owner.alpha@serviceflow.test","email_verified":true}','email',null,statement_timestamp(),statement_timestamp()),
  ('00000000-0000-4000-8000-000000000102','00000000-0000-4000-8000-000000000102','{"sub":"00000000-0000-4000-8000-000000000102","email":"staff.alpha@serviceflow.test","email_verified":true}','email',null,statement_timestamp(),statement_timestamp());
+
+insert into auth.identities(provider_id,user_id,identity_data,provider,last_sign_in_at,created_at,updated_at)
+values ('00000000-0000-4000-8000-000000000201','00000000-0000-4000-8000-000000000201','{"sub":"00000000-0000-4000-8000-000000000201","email":"owner.beta@serviceflow.invalid","email_verified":true}','email',null,statement_timestamp(),statement_timestamp());
 
 -- The profile trigger ignores platform_role in user metadata. Trusted seed maintenance performs
 -- the one explicit platform-admin assignment after proving the trigger created a normal user.
@@ -119,6 +125,12 @@ values (
   '2026-09-07 07:00:00+00','2026-09-07 07:15:00+00','confirmed','SF-FICTIONAL-EXISTING','Fictional Movement Session',
   60,15,18000,'RON','none','Casey Alpha','client.alpha@serviceflow.invalid','+40000000001','Europe/Bucharest',
   'Fictional Alpha booking policy.','fixture-v1','2026-08-01 09:00:00+00'
+),(
+  '29000000-0000-4000-8000-000000000201','20000000-0000-4000-8000-000000000001','23000000-0000-4000-8000-000000000201',
+  '24000000-0000-4000-8000-000000000202','27000000-0000-4000-8000-000000000203','2026-09-10 08:00:00+00',
+  '2026-09-10 08:45:00+00','2026-09-10 09:00:00+00','confirmed','SF-FICTIONAL-BETA-001','Fictional Strategy Session',
+  45,15,12500,'EUR','deposit','Cameron Beta','client.beta@serviceflow.invalid','+49000000001','Europe/Berlin',
+  'Fictional Beta booking policy.','fixture-v1','2026-08-01 09:00:00+00'
 );
 
 insert into public.booking_holds(id,organization_id,service_id,staff_profile_id,starts_at,ends_at,buffer_ends_at,status,expires_at)

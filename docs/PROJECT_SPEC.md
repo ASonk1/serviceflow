@@ -299,3 +299,6 @@ The MVP is release-ready only when:
 - Email/cron delivery is at-least-once; deduplicate by notification key and treat provider delivery separately from domain success.
 - Broad dashboards can expand scope; prefer complete, polished core flows and simple server-rendered aggregates over real-time BI.
 - Public endpoints invite enumeration and abuse; use opaque references, generic responses, input bounds, rate limiting, and bot/spam mitigations appropriate to a portfolio deployment.
+## Phase 6A owner appointment operations
+
+Authenticated owners have a read-only operational overview at `/dashboard` and a complete appointment workspace at `/dashboard/appointments`. The workspace supports bounded server-side search, status/service/staff/date filters, allowlisted sorting, exact pagination, a grouped calendar agenda, and tenant-safe detail pages. Displayed historical service, staff, contact, price, payment, timezone, and policy values come from immutable appointment snapshots. Mutations, client directory, staff schedules, payments, delivery workers, and analytics remain deferred to Phases 6B–6D and later.

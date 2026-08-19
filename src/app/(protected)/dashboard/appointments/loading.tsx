@@ -1,0 +1,1 @@
+export default function Loading(){return <main id="main-content" className="dashboard-foundation" aria-busy="true"><div className="service-empty" role="status"><h1>Loading appointments…</h1><p>Preparing the owner workspace.</p></div></main>}

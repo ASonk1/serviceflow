@@ -105,10 +105,12 @@ export type Database = {
           public_reference: string
           service_id: string
           service_name_snapshot: string
+          staff_name_snapshot: string
           staff_profile_id: string
           starts_at: string
           status: string
           timezone_snapshot: string
+          updated_at: string
         }
         Insert: {
           buffer_ends_at: string
@@ -132,10 +134,12 @@ export type Database = {
           public_reference: string
           service_id: string
           service_name_snapshot: string
+          staff_name_snapshot: string
           staff_profile_id: string
           starts_at: string
           status: string
           timezone_snapshot: string
+          updated_at?: string
         }
         Update: {
           buffer_ends_at?: string
@@ -159,10 +163,12 @@ export type Database = {
           public_reference?: string
           service_id?: string
           service_name_snapshot?: string
+          staff_name_snapshot?: string
           staff_profile_id?: string
           starts_at?: string
           status?: string
           timezone_snapshot?: string
+          updated_at?: string
         }
         Relationships: [
           {
@@ -1209,6 +1215,14 @@ export type Database = {
         Args: { target_invitation_id: string }
         Returns: Json
       }
+      get_owner_appointment_detail: {
+        Args: { target_appointment_id: string; target_org_id: string }
+        Returns: Json
+      }
+      get_owner_appointment_overview: {
+        Args: { as_of?: string; target_org_id: string }
+        Returns: Json
+      }
       get_owner_team: { Args: { target_org_id: string }; Returns: Json }
       get_public_availability_context: {
         Args: {
@@ -1234,6 +1248,22 @@ export type Database = {
           search_text?: string
           sort_direction?: string
           sort_field?: string
+          status_filter?: string
+          target_limit?: number
+          target_offset?: number
+          target_org_id: string
+        }
+        Returns: Json
+      }
+      list_owner_appointments: {
+        Args: {
+          date_from?: string
+          date_to?: string
+          search_text?: string
+          service_filter?: string
+          sort_direction?: string
+          sort_field?: string
+          staff_filter?: string
           status_filter?: string
           target_limit?: number
           target_offset?: number
