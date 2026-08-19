@@ -1,20 +1,28 @@
 -- Deterministic local/test-only fixtures. Every identity and business below is fictional.
--- Auth placeholders deliberately have no password. Login-capable local users must later be
--- created through the Auth admin API; password hashes are never inserted by seed SQL.
+-- Auth placeholders deliberately have no password. The Alpha owner/staff email identities below
+-- allow isolated browser tests to establish their own sessions through the local recovery flow.
 
 begin;
 
 insert into auth.users (id, email, raw_user_meta_data)
 values
   ('00000000-0000-4000-8000-000000000001', 'platform.admin@serviceflow.invalid', '{"display_name":"Platform Admin Fixture","platform_role":"platform_admin"}'),
-  ('00000000-0000-4000-8000-000000000101', 'owner.alpha@serviceflow.invalid', '{"display_name":"Avery Alpha"}'),
-  ('00000000-0000-4000-8000-000000000102', 'staff.alpha@serviceflow.invalid', '{"display_name":"Sage Alpha"}'),
+  ('00000000-0000-4000-8000-000000000101', 'owner.alpha@serviceflow.test', '{"display_name":"Avery Alpha"}'),
+  ('00000000-0000-4000-8000-000000000102', 'staff.alpha@serviceflow.test', '{"display_name":"Sage Alpha"}'),
   ('00000000-0000-4000-8000-000000000103', 'client.alpha@serviceflow.invalid', '{"display_name":"Casey Alpha"}'),
   ('00000000-0000-4000-8000-000000000104', 'inactive.alpha@serviceflow.invalid', '{"display_name":"Inactive Alpha"}'),
   ('00000000-0000-4000-8000-000000000201', 'owner.beta@serviceflow.invalid', '{"display_name":"Blair Beta"}'),
   ('00000000-0000-4000-8000-000000000202', 'staff.beta@serviceflow.invalid', '{"display_name":"Sky Beta"}'),
   ('00000000-0000-4000-8000-000000000203', 'client.beta@serviceflow.invalid', '{"display_name":"Cameron Beta"}'),
   ('00000000-0000-4000-8000-000000000301', 'owner.isolation@serviceflow.invalid', '{"display_name":"Ira Isolation"}');
+
+update auth.users set instance_id='00000000-0000-0000-0000-000000000000',aud='authenticated',role='authenticated',raw_app_meta_data='{"provider":"email","providers":["email"]}',encrypted_password='',email_confirmed_at=statement_timestamp(),confirmation_token='',recovery_token='',email_change='',email_change_token_new='',email_change_token_current='',phone_change='',phone_change_token='',reauthentication_token='',created_at=statement_timestamp(),updated_at=statement_timestamp()
+where id in ('00000000-0000-4000-8000-000000000101','00000000-0000-4000-8000-000000000102');
+
+insert into auth.identities(provider_id,user_id,identity_data,provider,last_sign_in_at,created_at,updated_at)
+values
+ ('00000000-0000-4000-8000-000000000101','00000000-0000-4000-8000-000000000101','{"sub":"00000000-0000-4000-8000-000000000101","email":"owner.alpha@serviceflow.test","email_verified":true}','email',null,statement_timestamp(),statement_timestamp()),
+ ('00000000-0000-4000-8000-000000000102','00000000-0000-4000-8000-000000000102','{"sub":"00000000-0000-4000-8000-000000000102","email":"staff.alpha@serviceflow.test","email_verified":true}','email',null,statement_timestamp(),statement_timestamp());
 
 -- The profile trigger ignores platform_role in user metadata. Trusted seed maintenance performs
 -- the one explicit platform-admin assignment after proving the trigger created a normal user.

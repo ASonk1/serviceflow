@@ -1,0 +1,1 @@
+"use client";export default function Error({reset}:{reset:()=>void}){return <main id="main-content" className="dashboard-foundation service-empty"><h1>Availability is temporarily unavailable</h1><p>Your schedule was not changed. Try loading it again.</p><button className="button button-primary" onClick={reset}>Try again</button></main>}

@@ -88,7 +88,7 @@ Progress: Phase 3 is complete across 3A–3C: atomic resumable setup, owner-oper
 
 ## 7. Phase 4 — Service, staff, and schedule management
 
-Progress: Phases 4A and 4B are implemented. Active verified owners can manage services and eligible assignments, list active/inactive members and invitation history, invite staff, resend/revoke pending invitations, edit general staff profiles, and activate/deactivate members through audited owner-only mutations. Phase 4C retains schedule/blocked-time management, and Phase 4D retains full URL-backed search/filter/pagination hardening.
+Progress: Phases 4A–4C are implemented. In addition to service and team management, active verified owners can manage recurring availability and blocked time for active team members in their operational organization, while staff can manage only their own schedule. Managed audited mutations, timezone/DST validation, overlap rules, and direct-write protection are enforced. Phase 4D retains full URL-backed search/filter/pagination hardening.
 
 ### Deliverables
 
