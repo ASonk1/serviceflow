@@ -1,0 +1,1 @@
+"use client";export default function Error({reset}:{reset:()=>void}){return <main id="main-content" className="dashboard-foundation"><div className="service-empty" role="alert"><h1>Appointments could not be loaded</h1><p>Please retry the read-only workspace.</p><button className="button button-primary" onClick={reset}>Retry</button></div></main>}

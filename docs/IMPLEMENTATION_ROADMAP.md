@@ -234,3 +234,10 @@ Progress: Phases 5A and 5B are complete. Public discovery and read-only availabi
 ## 16. Post-MVP opportunities (not committed)
 
 Only consider after production gates and measured demand: calendar export/sync, recurring appointments, group capacity, waitlist, multiple locations/resources, organization subscription billing, refund automation, advanced reporting, custom domains, and localized UI. Each requires an explicit threat/model/data migration review rather than extension by assumption.
+### Phase 6A — Owner appointment workspace (implemented)
+
+- Read-only owner metrics and upcoming schedule on `/dashboard`.
+- Shareable, validated appointment list/calendar agenda at `/dashboard/appointments`.
+- Tenant-safe immutable-snapshot detail at `/dashboard/appointments/[appointmentId]` with event and notification state.
+- Organization-timezone filtering, bounded pagination, stable ordering, secure owner RPCs, and supporting indexes.
+- Phase 6B–6D mutations, client directory, staff schedule, client dashboard, payments, workers, and analytics remain deferred.

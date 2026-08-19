@@ -468,3 +468,6 @@ Functions must accept actor context only where it can be verified against `auth.
 - Seed data is deterministic, fictional, idempotent, and environment-gated. Password/demo auth-user creation uses a supported local/admin seed path, never inserts password hashes manually.
 - Destructive schema changes use expand/migrate/contract across releases. Prefer forward-fix migrations to unsafe down migrations after production data exists.
 - Measure index use with representative data; avoid speculative duplicate indexes and inspect query plans for appointment lists, availability, client search, analytics, audit, reminders, and webhook reconciliation.
+## Phase 6A owner read projections
+
+`appointments.staff_name_snapshot` preserves the assigned display name and `appointments.updated_at` supplies read-only record metadata. Supporting tenant/date/status/service/staff and child timeline indexes match the owner workspace access paths. `get_owner_appointment_overview`, `list_owner_appointments`, and `get_owner_appointment_detail` are fixed-search-path, owner-only functions granted solely to `authenticated`; direct table RLS remains deny-by-default for unauthorized roles. Local dates are converted to UTC using the organization IANA timezone, including DST transitions.
