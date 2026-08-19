@@ -801,6 +801,54 @@ export type Database = {
       }
       get_owner_team: { Args: { target_org_id: string }; Returns: Json }
       get_public_business: { Args: { public_slug: string }; Returns: Json }
+      list_managed_services: {
+        Args: {
+          search_text?: string
+          sort_direction?: string
+          sort_field?: string
+          status_filter?: string
+          target_limit?: number
+          target_offset?: number
+          target_org_id: string
+        }
+        Returns: Json
+      }
+      list_owner_invitations: {
+        Args: {
+          search_text?: string
+          sort_direction?: string
+          sort_field?: string
+          status_filter?: string
+          target_limit?: number
+          target_offset?: number
+          target_org_id: string
+        }
+        Returns: Json
+      }
+      list_owner_team_members: {
+        Args: {
+          role_filter?: string
+          search_text?: string
+          sort_direction?: string
+          sort_field?: string
+          status_filter?: string
+          target_limit?: number
+          target_offset?: number
+          target_org_id: string
+        }
+        Returns: Json
+      }
+      list_schedule_members: {
+        Args: {
+          search_text?: string
+          sort_direction?: string
+          sort_field?: string
+          target_limit?: number
+          target_offset?: number
+          target_org_id: string
+        }
+        Returns: Json
+      }
       publish_organization: { Args: { target_org_id: string }; Returns: string }
       replace_onboarding_availability: {
         Args: { intervals: Json; target_org_id: string }

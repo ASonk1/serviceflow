@@ -64,6 +64,11 @@ insert into public.services (
 )
 values
   ('12000000-0000-4000-8000-000000000101', '10000000-0000-4000-8000-000000000001', 'Fictional Movement Session', 'A fictional individual movement session.', 60, 15, 18000, 'RON', 'none', null, 'public', 'active'),
+  ('12000000-0000-4000-8000-000000000111', '10000000-0000-4000-8000-000000000001', 'Balance Foundations', 'Deterministic fictional balance coaching fixture.', 30, 5, 9000, 'RON', 'none', null, 'public', 'active'),
+  ('12000000-0000-4000-8000-000000000112', '10000000-0000-4000-8000-000000000001', 'Core Mobility Lab', 'Deterministic fictional mobility fixture.', 45, 10, 12500, 'RON', 'none', null, 'public', 'active'),
+  ('12000000-0000-4000-8000-000000000113', '10000000-0000-4000-8000-000000000001', 'Guided Recovery', 'Deterministic fictional recovery fixture.', 50, 10, 14000, 'RON', 'none', null, 'private', 'draft'),
+  ('12000000-0000-4000-8000-000000000114', '10000000-0000-4000-8000-000000000001', 'Posture Reset', 'Deterministic fictional posture fixture.', 40, 5, 11000, 'RON', 'none', null, 'public', 'archived'),
+  ('12000000-0000-4000-8000-000000000115', '10000000-0000-4000-8000-000000000001', 'Strength Essentials', 'Deterministic fictional strength fixture.', 55, 15, 16000, 'RON', 'none', null, 'public', 'active'),
   ('23000000-0000-4000-8000-000000000201', '20000000-0000-4000-8000-000000000001', 'Fictional Strategy Session', 'A fictional consulting session.', 45, 15, 12500, 'EUR', 'deposit', 2500, 'public', 'active'),
   ('34000000-0000-4000-8000-000000000301', '30000000-0000-4000-8000-000000000001', 'Suspended Fixture Service', 'Not operational.', 30, 0, 5000, 'GBP', 'none', null, 'private', 'draft');
 
