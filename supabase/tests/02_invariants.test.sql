@@ -73,7 +73,7 @@ select throws_ok(
 );
 
 select is((select count(*) from public.organizations), 3::bigint, 'three deterministic fictional organizations are seeded');
-select is((select count(*) from public.user_profiles), 10::bigint, 'all seeded and test auth identities have profiles');
+select is((select count(*) from public.user_profiles), 11::bigint, 'all seeded and test auth identities have profiles');
 select is((select count(*) from public.organization_memberships where status = 'invited' and user_id is null), 1::bigint, 'pending invitation keeps a null user id');
 select is((select count(*) from public.client_records where user_id is null), 0::bigint, 'seed does not auto-link any client by entered email');
 

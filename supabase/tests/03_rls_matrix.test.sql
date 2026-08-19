@@ -15,11 +15,11 @@ set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-000000000101","role":"authenticated"}', true);
 select is((select count(*) from public.organizations), 1::bigint, 'owner A selects only own organization');
 select is((select count(*) from public.organization_settings), 1::bigint, 'owner A selects only own settings');
-select is((select count(*) from public.organization_memberships), 4::bigint, 'owner A selects only own memberships');
+select is((select count(*) from public.organization_memberships), 5::bigint, 'owner A selects only own memberships');
 select is((select count(*) from public.services), 6::bigint, 'owner A selects only own services');
-select is((select count(*) from public.staff_profiles), 1::bigint, 'owner A selects only own staff profiles');
-select is((select count(*) from public.service_staff), 1::bigint, 'owner A selects only own assignments');
-select is((select count(*) from public.weekly_availability), 1::bigint, 'owner A selects only own availability');
+select is((select count(*) from public.staff_profiles), 2::bigint, 'owner A selects only own staff profiles');
+select is((select count(*) from public.service_staff), 3::bigint, 'owner A selects only own assignments');
+select is((select count(*) from public.weekly_availability), 2::bigint, 'owner A selects only own availability');
 select is((select count(*) from public.blocked_times), 1::bigint, 'owner A selects only own blocks');
 select is((select count(*) from public.client_records), 1::bigint, 'owner A selects only own clients');
 select is((select count(*) from public.audit_logs), 1::bigint, 'owner A selects only own audit rows');
@@ -63,7 +63,7 @@ select throws_ok($$select private.write_audit_log('10000000-0000-4000-8000-00000
 -- Staff A reads only their own profile, assignment and schedule and may update own schedule.
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-000000000102","role":"authenticated"}', true);
 select is((select count(*) from public.staff_profiles), 1::bigint, 'staff sees own profile only');
-select is((select count(*) from public.service_staff), 1::bigint, 'staff sees own assignment only');
+select is((select count(*) from public.service_staff), 2::bigint, 'staff sees only own assignments');
 select is((select count(*) from public.weekly_availability), 1::bigint, 'staff sees own availability only');
 select is((select count(*) from public.blocked_times), 1::bigint, 'staff sees own blocks only');
 select is((select count(*) from public.client_records), 0::bigint, 'staff cannot select private client records');

@@ -204,6 +204,10 @@ Inputs are organization, service, optional staff, date range (bounded), and curr
 6. Apply lead time, horizon, and slot interval; retain candidates that fit fully inside a window.
 7. Return deduplicated slots with opaque staff ID only where intended and an explicit timezone.
 
+Phase 5A implements this as one pure server availability module fed by `get_public_availability_context`. The fixed-empty-search-path function validates the published tenant, active public service, active assignment, active accepted membership, public staff profile, and requested local date relationship before returning only booking configuration, public staff fields, recurring clock windows, and anonymous occupied intervals. Blocks omit reasons; appointments and non-expired active holds omit identifiers and customer data. The module converts local window endpoints through the IANA organization timezone, rejects ambiguous/nonexistent endpoints, compares half-open occupied intervals in UTC, enforces lead time and horizon, requires duration plus cleanup to fit, deduplicates any-staff starts while retaining eligible opaque staff IDs, and sorts deterministically. Availability responses are request-bound and `private, no-store`.
+
+The public handler is deliberately limited to one slug, service, optional staff, and one ISO local date. There is no in-memory rate limiter. Production deployment must add a serverless-safe distributed limiter or equivalent edge/firewall rule before treating the endpoint as internet-hardened.
+
 Availability responses are hints, not reservations.
 
 ### Atomic booking/rescheduling
