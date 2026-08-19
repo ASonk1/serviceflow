@@ -159,6 +159,8 @@ Indexes: `(organization_id, status, name, id)`, optional normalized/trigram name
 
 Phase 4A service mutations use `create_managed_service`, `update_managed_service`, `set_managed_service_status`, and `set_managed_service_staff`. Each fixed-search-path security-definer function derives the verified active owner through `auth.uid()`, resolves organization and currency server-side, locks target rows where appropriate, and writes a redacted audit event. An invoker trigger blocks direct authenticated service and assignment writes, while existing trusted onboarding functions remain compatible. Assignment eligibility requires a same-tenant active public profile backed by an active verified owner/staff membership. Assignment retries update the existing `(service_id, staff_profile_id)` row rather than duplicating it.
 
+Phase 4D list reads use fixed-search-path functions rather than exposing raw multi-field filter syntax. `list_managed_services`, `list_owner_team_members`, and `list_owner_invitations` require the verified active owner of the requested operational tenant; `list_schedule_members` permits that owner or an active staff member and projects only the staff actor's own eligible profile. Inputs are bounded search text, checked lifecycle values, allowlisted sort/direction values, and page windows of 5, 10, or 20 rows. Results contain narrow JSON DTOs, exact filtered/organization totals, and deterministic UUID-tiebroken ordering. Existing indexes support tenant and lifecycle narrowing; no unmeasured trigram index is introduced.
+
 ### `staff_profiles`
 
 | Column | Type | Rules |

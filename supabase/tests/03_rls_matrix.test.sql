@@ -16,7 +16,7 @@ select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-0000000
 select is((select count(*) from public.organizations), 1::bigint, 'owner A selects only own organization');
 select is((select count(*) from public.organization_settings), 1::bigint, 'owner A selects only own settings');
 select is((select count(*) from public.organization_memberships), 4::bigint, 'owner A selects only own memberships');
-select is((select count(*) from public.services), 1::bigint, 'owner A selects only own services');
+select is((select count(*) from public.services), 6::bigint, 'owner A selects only own services');
 select is((select count(*) from public.staff_profiles), 1::bigint, 'owner A selects only own staff profiles');
 select is((select count(*) from public.service_staff), 1::bigint, 'owner A selects only own assignments');
 select is((select count(*) from public.weekly_availability), 1::bigint, 'owner A selects only own availability');

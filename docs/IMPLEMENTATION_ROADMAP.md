@@ -88,7 +88,7 @@ Progress: Phase 3 is complete across 3A–3C: atomic resumable setup, owner-oper
 
 ## 7. Phase 4 — Service, staff, and schedule management
 
-Progress: Phases 4A–4C are implemented. In addition to service and team management, active verified owners can manage recurring availability and blocked time for active team members in their operational organization, while staff can manage only their own schedule. Managed audited mutations, timezone/DST validation, overlap rules, and direct-write protection are enforced. Phase 4D retains full URL-backed search/filter/pagination hardening.
+Progress: Phase 4 is complete across 4A–4D. Service and team management, owner/staff schedule management, managed audited mutations, timezone/DST validation, overlap rules, and direct-write protection are enforced. Service, team membership, invitation-history, and availability-member lists now use validated shareable URL state with server-side search, allowlisted filters/sorts, exact bounded pagination, deterministic ordering, responsive accessible controls, and tenant/role-safe read projections. Appointment/client list tooling remains correctly deferred until those Phase 6 domains exist.
 
 ### Deliverables
 
