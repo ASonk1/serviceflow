@@ -107,8 +107,19 @@ values
   ('16000000-0000-4000-8000-000000000103', '10000000-0000-4000-8000-000000000001', '00000000-0000-4000-8000-000000000103', 'client.alpha@serviceflow.invalid', 'client.alpha@serviceflow.invalid', 'Casey Alpha', '+40000000001', 'Private fictional owner note A.'),
   ('27000000-0000-4000-8000-000000000203', '20000000-0000-4000-8000-000000000001', '00000000-0000-4000-8000-000000000203', 'client.beta@serviceflow.invalid', 'client.beta@serviceflow.invalid', 'Cameron Beta', '+49000000001', 'Private fictional owner note B.');
 
-insert into public.appointments(id,organization_id,service_id,staff_profile_id,starts_at,ends_at,buffer_ends_at,status)
-values ('19000000-0000-4000-8000-000000000101','10000000-0000-4000-8000-000000000001','12000000-0000-4000-8000-000000000101','13000000-0000-4000-8000-000000000102','2026-09-07 06:00:00+00','2026-09-07 07:00:00+00','2026-09-07 07:15:00+00','confirmed');
+insert into public.appointments(
+  id,organization_id,service_id,staff_profile_id,client_record_id,starts_at,ends_at,buffer_ends_at,status,public_reference,
+  service_name_snapshot,duration_minutes_snapshot,buffer_minutes_snapshot,price_minor_snapshot,currency_snapshot,
+  payment_mode_snapshot,client_name_snapshot,client_email_snapshot,client_phone_snapshot,timezone_snapshot,
+  policy_text_snapshot,policy_version_snapshot,policy_accepted_at
+)
+values (
+  '19000000-0000-4000-8000-000000000101','10000000-0000-4000-8000-000000000001','12000000-0000-4000-8000-000000000101',
+  '13000000-0000-4000-8000-000000000102','16000000-0000-4000-8000-000000000103','2026-09-07 06:00:00+00',
+  '2026-09-07 07:00:00+00','2026-09-07 07:15:00+00','confirmed','SF-FICTIONAL-EXISTING','Fictional Movement Session',
+  60,15,18000,'RON','none','Casey Alpha','client.alpha@serviceflow.invalid','+40000000001','Europe/Bucharest',
+  'Fictional Alpha booking policy.','fixture-v1','2026-08-01 09:00:00+00'
+);
 
 insert into public.booking_holds(id,organization_id,service_id,staff_profile_id,starts_at,ends_at,buffer_ends_at,status,expires_at)
 values

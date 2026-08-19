@@ -1,0 +1,1 @@
+export default function Loading(){return <main id="main-content" className="booking-page" aria-busy="true"><section className="booking-shell" role="status"><p className="eyebrow">Loading</p><h1>Preparing your booking details…</h1><p>We are checking the selected time.</p></section></main>}

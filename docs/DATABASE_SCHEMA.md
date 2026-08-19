@@ -226,7 +226,7 @@ Indexes: GiST `(staff_profile_id, tstzrange(starts_at, ends_at, '[)'))` where fe
 
 Short-lived reservation attempts for payment-required bookings.
 
-Phase 5A creates the deny-by-default scheduling subset of `appointments` and `booking_holds` needed to subtract existing occupancy. Anonymous callers cannot select either table. `get_public_availability_context` exposes only staff-scoped start/end intervals for active appointment statuses and active, non-expired holds after validating the complete published organization/service/staff relationship. Customer, appointment, hold, block-reason, and tenant identifiers are not projected. Later booking phases extend these tables with snapshots, client/payment relationships, idempotency, and transactional write functions.
+Phase 5A creates the deny-by-default scheduling subset of `appointments` and `booking_holds` needed to subtract existing occupancy. Phase 5B extends appointments with a tenant client link, opaque public reference, and immutable service, price, payment, contact, timezone, and accepted-policy snapshots. Active staff intervals have a GiST exclusion constraint. `appointment_events` and `booking_submissions` are append-only; `notification_deliveries` is a durable pending outbox; `guest_management_tokens` stores only SHA-256 hashes, bounded expiry, view capability, and revocation state; and `booking_rate_limits` provides atomic serverless-safe submission bounds. RLS is enabled and anonymous/authenticated table privileges are revoked for every booking artifact. Narrow fixed-search-path functions are the only public boundary.
 
 | Column | Type | Rules |
 |---|---|---|

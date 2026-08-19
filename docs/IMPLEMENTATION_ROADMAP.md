@@ -107,7 +107,7 @@ Progress: Phase 4 is complete across 4A–4D. Service and team management, owner
 
 ## 8. Phase 5 — Availability engine and no-payment booking
 
-Progress: Phase 5A is complete for public discovery and read-only availability selection. Published business discovery, eligible staff/any-staff selection, business-local dates, authoritative server slot calculation, occupied-interval subtraction, shareable URL state, and selection summaries are implemented. Customer details, holds created by visitors, reservation writes, confirmation, and all payment behavior remain later Phase 5 work.
+Progress: Phases 5A and 5B are complete. Public discovery and read-only availability now continue through strictly validated contact/policy review, an atomic no-payment booking transaction, and a private reloadable confirmation. The database revalidates trusted service/configuration data, assigns “any staff” under an advisory lock, prevents active staff overlap, upserts the tenant client without touching notes, persists immutable snapshots, and atomically creates the appointment event, audit entry, pending notification, hashed guest token, and idempotency record. Payment-mode services, email delivery, cancellation/rescheduling, and payment behavior remain deferred.
 
 ### Deliverables
 

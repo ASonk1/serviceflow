@@ -174,6 +174,8 @@ Phase delivery note: before the Phase 5 booking engine is implemented, the publi
 
 Phase 5A delivers the read-only portion: `/book/[slug]` discovers intentionally published services and `/book/[slug]/availability` selects eligible staff/date/slot with reloadable URL state. A selected slot is explicitly neither held nor confirmed. `/api/availability` accepts exactly one validated slug, service, staff choice, and local date and returns no-store public DTOs. Distributed edge rate limiting remains a deployment-hardening requirement; the implementation does not claim an in-memory limiter is production safe.
 
+Phase 5B adds `/book/[slug]/details` and `/book/[slug]/confirmation/[reference]` for services whose trusted payment mode is `none`. A Server Action sends validated contact, policy acceptance, selected instant, opaque idempotency key, and a guest-token hash to one transactional database function. The database reloads all authority, rechecks availability in the business timezone, selects any-staff deterministically, creates a confirmed appointment and durable side effects atomically, and stores only a one-way guest-token hash. Confirmation requires that private token or verified authenticated client ownership. Confirmation email is queued but intentionally not sent. Booking submission uses an atomic database-backed 15-minute limiter keyed by a one-way request fingerprint; the Phase 5A availability endpoint still requires a production edge/platform limiter.
+
 ### 7.6 Appointments
 
 - Appointment statuses are `pending_payment`, `confirmed`, `completed`, `cancelled`, and `no_show`; transitions follow a documented state machine.

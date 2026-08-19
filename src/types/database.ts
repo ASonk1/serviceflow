@@ -34,41 +34,144 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointment_events: {
+        Row: {
+          actor_type: string
+          actor_user_id: string | null
+          appointment_id: string
+          event_type: string
+          id: string
+          metadata: Json
+          occurred_at: string
+          organization_id: string
+        }
+        Insert: {
+          actor_type: string
+          actor_user_id?: string | null
+          appointment_id: string
+          event_type: string
+          id?: string
+          metadata?: Json
+          occurred_at?: string
+          organization_id: string
+        }
+        Update: {
+          actor_type?: string
+          actor_user_id?: string | null
+          appointment_id?: string
+          event_type?: string
+          id?: string
+          metadata?: Json
+          occurred_at?: string
+          organization_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_events_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_events_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointments: {
         Row: {
           buffer_ends_at: string
+          buffer_minutes_snapshot: number
+          client_email_snapshot: string
+          client_name_snapshot: string
+          client_phone_snapshot: string | null
+          client_record_id: string | null
           created_at: string
+          currency_snapshot: string
+          deposit_minor_snapshot: number | null
+          duration_minutes_snapshot: number
           ends_at: string
           id: string
           organization_id: string
+          payment_mode_snapshot: string
+          policy_accepted_at: string
+          policy_text_snapshot: string
+          policy_version_snapshot: string
+          price_minor_snapshot: number
+          public_reference: string
           service_id: string
+          service_name_snapshot: string
           staff_profile_id: string
           starts_at: string
           status: string
+          timezone_snapshot: string
         }
         Insert: {
           buffer_ends_at: string
+          buffer_minutes_snapshot: number
+          client_email_snapshot: string
+          client_name_snapshot: string
+          client_phone_snapshot?: string | null
+          client_record_id?: string | null
           created_at?: string
+          currency_snapshot: string
+          deposit_minor_snapshot?: number | null
+          duration_minutes_snapshot: number
           ends_at: string
           id?: string
           organization_id: string
+          payment_mode_snapshot: string
+          policy_accepted_at: string
+          policy_text_snapshot: string
+          policy_version_snapshot: string
+          price_minor_snapshot: number
+          public_reference: string
           service_id: string
+          service_name_snapshot: string
           staff_profile_id: string
           starts_at: string
           status: string
+          timezone_snapshot: string
         }
         Update: {
           buffer_ends_at?: string
+          buffer_minutes_snapshot?: number
+          client_email_snapshot?: string
+          client_name_snapshot?: string
+          client_phone_snapshot?: string | null
+          client_record_id?: string | null
           created_at?: string
+          currency_snapshot?: string
+          deposit_minor_snapshot?: number | null
+          duration_minutes_snapshot?: number
           ends_at?: string
           id?: string
           organization_id?: string
+          payment_mode_snapshot?: string
+          policy_accepted_at?: string
+          policy_text_snapshot?: string
+          policy_version_snapshot?: string
+          price_minor_snapshot?: number
+          public_reference?: string
           service_id?: string
+          service_name_snapshot?: string
           staff_profile_id?: string
           starts_at?: string
           status?: string
+          timezone_snapshot?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "appointments_client_fk"
+            columns: ["organization_id", "client_record_id"]
+            isOneToOne: false
+            referencedRelation: "client_records"
+            referencedColumns: ["organization_id", "id"]
+          },
           {
             foreignKeyName: "appointments_organization_id_fkey"
             columns: ["organization_id"]
@@ -253,6 +356,69 @@ export type Database = {
           },
         ]
       }
+      booking_rate_limits: {
+        Row: {
+          key_hash: string
+          request_count: number
+          window_started_at: string
+        }
+        Insert: {
+          key_hash: string
+          request_count: number
+          window_started_at: string
+        }
+        Update: {
+          key_hash?: string
+          request_count?: number
+          window_started_at?: string
+        }
+        Relationships: []
+      }
+      booking_submissions: {
+        Row: {
+          appointment_id: string
+          created_at: string
+          guest_token_hash: string
+          id: string
+          idempotency_key: string
+          organization_id: string
+          payload_hash: string
+        }
+        Insert: {
+          appointment_id: string
+          created_at?: string
+          guest_token_hash: string
+          id?: string
+          idempotency_key: string
+          organization_id: string
+          payload_hash: string
+        }
+        Update: {
+          appointment_id?: string
+          created_at?: string
+          guest_token_hash?: string
+          id?: string
+          idempotency_key?: string
+          organization_id?: string
+          payload_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_submissions_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_submissions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_records: {
         Row: {
           created_at: string
@@ -299,6 +465,111 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "client_records_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guest_management_tokens: {
+        Row: {
+          appointment_id: string
+          capabilities: string[]
+          created_at: string
+          expires_at: string
+          id: string
+          last_used_at: string | null
+          organization_id: string
+          revoked_at: string | null
+          token_hash: string
+        }
+        Insert: {
+          appointment_id: string
+          capabilities?: string[]
+          created_at?: string
+          expires_at: string
+          id?: string
+          last_used_at?: string | null
+          organization_id: string
+          revoked_at?: string | null
+          token_hash: string
+        }
+        Update: {
+          appointment_id?: string
+          capabilities?: string[]
+          created_at?: string
+          expires_at?: string
+          id?: string
+          last_used_at?: string | null
+          organization_id?: string
+          revoked_at?: string | null
+          token_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guest_management_tokens_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guest_management_tokens_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_deliveries: {
+        Row: {
+          appointment_id: string
+          channel: string
+          created_at: string
+          id: string
+          idempotency_key: string
+          organization_id: string
+          recipient_email: string
+          scheduled_for: string
+          status: string
+          template: string
+        }
+        Insert: {
+          appointment_id: string
+          channel?: string
+          created_at?: string
+          id?: string
+          idempotency_key: string
+          organization_id: string
+          recipient_email: string
+          scheduled_for?: string
+          status?: string
+          template: string
+        }
+        Update: {
+          appointment_id?: string
+          channel?: string
+          created_at?: string
+          id?: string
+          idempotency_key?: string
+          organization_id?: string
+          recipient_email?: string
+          scheduled_for?: string
+          status?: string
+          template?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_deliveries_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_deliveries_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -855,6 +1126,10 @@ export type Database = {
         Args: { target_invitation_id: string }
         Returns: string
       }
+      check_public_booking_rate_limit: {
+        Args: { rate_key_hash: string }
+        Returns: boolean
+      }
       complete_onboarding_review: {
         Args: { target_org_id: string }
         Returns: undefined
@@ -878,6 +1153,22 @@ export type Database = {
           target_org_id: string
         }
         Returns: string
+      }
+      create_public_no_payment_booking: {
+        Args: {
+          contact_email: string
+          contact_name: string
+          contact_phone: string
+          guest_token_hash: string
+          policy_accepted: boolean
+          public_service_id: string
+          public_slug: string
+          public_staff_id: string
+          rate_key_hash: string
+          requested_start: string
+          submission_key: string
+        }
+        Returns: Json
       }
       create_team_invitation: {
         Args: { invite_email: string; target_org_id: string }
@@ -927,6 +1218,14 @@ export type Database = {
           public_slug: string
           public_staff_id: string
         }
+        Returns: Json
+      }
+      get_public_booking_confirmation: {
+        Args: { guest_token_hash?: string; public_reference: string }
+        Returns: Json
+      }
+      get_public_booking_policy: {
+        Args: { public_service_id: string; public_slug: string }
         Returns: Json
       }
       get_public_business: { Args: { public_slug: string }; Returns: Json }

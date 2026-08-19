@@ -208,6 +208,10 @@ Phase 5A implements this as one pure server availability module fed by `get_publ
 
 The public handler is deliberately limited to one slug, service, optional staff, and one ISO local date. There is no in-memory rate limiter. Production deployment must add a serverless-safe distributed limiter or equivalent edge/firewall rule before treating the endpoint as internet-hardened.
 
+Phase 5B keeps the mutation behind a Server Action and `create_public_no_payment_booking`, a volatile fixed-empty-search-path function granted narrowly to anonymous/authenticated callers. It derives tenant, settings, policy, service snapshots, eligibility, and verified identity from trusted rows. A transaction-scoped advisory lock serializes each staff/local-date schedule; deterministic UUID ordering lets “any staff” retry the next eligible provider after a conflicting interval, while a GiST exclusion constraint is the final overlap invariant. Idempotency is tenant-scoped and bound to both a canonical payload hash and guest-token hash. The same valid retry returns the original reference; payload or token mismatch fails generically.
+
+The command upserts a normalized-email `client_records` row without updating notes, and links `user_id` only when `auth.uid()` has an active profile, confirmed Auth email, and the entered normalized email matches. Appointment snapshots, the created event, redacted audit record, unique pending notification, hashed 30-day view token, and idempotency row share the same transaction. The raw token exists only at the trusted Next.js boundary and in the visitor’s private confirmation URL. Confirmation lookup requires an unexpired, unrevoked token with `view` capability or verified authenticated ownership. Direct anonymous/authenticated reads of all write-side tables remain denied.
+
 Availability responses are hints, not reservations.
 
 ### Atomic booking/rescheduling

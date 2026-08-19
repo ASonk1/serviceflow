@@ -1,0 +1,12 @@
+import {describe,expect,it} from "vitest";
+import {bookingSubmissionSchema,createGuestToken,createRateKey,hashGuestToken,mapBookingError,normalizeContact,confirmationSchema} from "@/features/booking/booking";
+
+const valid={slug:"fictional-alpha",serviceId:"12000000-0000-4000-8000-000000000111",staff:"any",date:"2026-09-07",startsAt:"2026-09-07T12:00:00.000Z",fullName:"Taylor Guest",email:"Taylor@Example.test",phone:"",policyAccepted:"on",submissionKey:"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",guestToken:"a".repeat(43)};
+describe("no-payment booking boundary",()=>{
+ it("strictly validates and normalizes contact submissions",()=>{const parsed=bookingSubmissionSchema.parse(valid);expect(parsed.email).toBe("taylor@example.test");expect(bookingSubmissionSchema.safeParse({...valid,extra:"no"}).success).toBe(false);expect(normalizeContact({fullName:" Taylor ",email:" A@B.test ",phone:" "})).toEqual({fullName:"Taylor",email:"a@b.test",phone:null})});
+ it("requires explicit policy acceptance and opaque keys",()=>{expect(bookingSubmissionSchema.safeParse({...valid,policyAccepted:undefined}).success).toBe(false);expect(bookingSubmissionSchema.safeParse({...valid,submissionKey:"guessable"}).success).toBe(false);expect(bookingSubmissionSchema.safeParse({...valid,guestToken:"short"}).success).toBe(false)});
+ it("hashes guest tokens deterministically without retaining them",()=>{const token=createGuestToken();expect(token).toMatch(/^[A-Za-z0-9_-]{43}$/);expect(hashGuestToken(token)).toMatch(/^[0-9a-f]{64}$/);expect(hashGuestToken(token)).not.toContain(token)});
+ it("creates stable privacy-preserving rate keys",()=>{expect(createRateKey("192.0.2.1","fictional-alpha","local")).toHaveLength(64);expect(createRateKey("192.0.2.1","fictional-alpha","local")).toBe(createRateKey("192.0.2.1","fictional-alpha","local"));expect(createRateKey("192.0.2.2","fictional-alpha","local")).not.toBe(createRateKey("192.0.2.1","fictional-alpha","local"))});
+ it("maps slot, retry, rate, and generic failures safely",()=>{expect(mapBookingError("BOOKING_SLOT_LOST").status).toBe("slot-lost");expect(mapBookingError("BOOKING_IDEMPOTENCY_MISMATCH").status).toBe("invalid");expect(mapBookingError("BOOKING_RATE_LIMITED").status).toBe("rate-limited");expect(mapBookingError("database internals")).toEqual({status:"error",message:"We could not complete the booking. Please review the selection and try again."})});
+ it("rejects private or malformed confirmation DTO fields",()=>{expect(confirmationSchema.safeParse({reference:"x",privateNotes:"secret"}).success).toBe(false)});
+});
