@@ -172,6 +172,8 @@ Phase delivery note: before the Phase 5 booking engine is implemented, the publi
 - DST boundaries are handled by storing instants in UTC and interpreting recurring availability in the IANA organization timezone. Ambiguous/nonexistent local times must not silently create invalid slots.
 - The availability endpoint is bounded by tenant/service/date and rate limited; it never returns private appointment details.
 
+Phase 5A delivers the read-only portion: `/book/[slug]` discovers intentionally published services and `/book/[slug]/availability` selects eligible staff/date/slot with reloadable URL state. A selected slot is explicitly neither held nor confirmed. `/api/availability` accepts exactly one validated slug, service, staff choice, and local date and returns no-store public DTOs. Distributed edge rate limiting remains a deployment-hardening requirement; the implementation does not claim an in-memory limiter is production safe.
+
 ### 7.6 Appointments
 
 - Appointment statuses are `pending_payment`, `confirmed`, `completed`, `cancelled`, and `no_show`; transitions follow a documented state machine.

@@ -1,0 +1,1 @@
+export default function Loading(){return <main id="main-content" className="booking-page"><section className="booking-shell"><div className="profile-loading" role="status" aria-live="polite">Checking current availability…</div></section></main>}

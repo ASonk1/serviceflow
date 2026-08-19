@@ -1,0 +1,7 @@
+import {NextResponse} from "next/server";
+import {z} from "zod";
+import {getAvailability} from "@/features/booking/server";
+import {localDateSchema,publicSlugSchema} from "@/features/booking/schemas";
+const querySchema=z.object({slug:publicSlugSchema,service:z.string().uuid(),staff:z.union([z.literal("any"),z.string().uuid()]),date:localDateSchema}).strict();
+const headers={"Cache-Control":"private, no-store, max-age=0"};
+export async function GET(request:Request){const url=new URL(request.url),raw=Object.fromEntries(url.searchParams);if([...url.searchParams.keys()].some(key=>!["slug","service","staff","date"].includes(key)))return NextResponse.json({error:"Invalid availability request."},{status:400,headers});const parsed=querySchema.safeParse(raw);if(!parsed.success)return NextResponse.json({error:"Invalid availability request."},{status:400,headers});const result=await getAvailability(parsed.data.slug,parsed.data.service,parsed.data.staff==="any"?null:parsed.data.staff,parsed.data.date);if(!result)return NextResponse.json({error:"Availability could not be loaded."},{status:404,headers});return NextResponse.json({timezone:result.context.organization.timezone,date:parsed.data.date,service:{name:result.context.service.name,durationMinutes:result.context.service.durationMinutes,bufferMinutes:result.context.service.bufferMinutes},staff:result.context.staff.map(person=>({id:person.id,displayName:person.displayName,jobTitle:person.jobTitle,avatarPath:person.avatarPath})),slots:result.slots},{headers})}

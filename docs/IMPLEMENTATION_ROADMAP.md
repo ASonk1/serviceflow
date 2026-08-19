@@ -107,6 +107,8 @@ Progress: Phase 4 is complete across 4A–4D. Service and team management, owner
 
 ## 8. Phase 5 — Availability engine and no-payment booking
 
+Progress: Phase 5A is complete for public discovery and read-only availability selection. Published business discovery, eligible staff/any-staff selection, business-local dates, authoritative server slot calculation, occupied-interval subtraction, shareable URL state, and selection summaries are implemented. Customer details, holds created by visitors, reservation writes, confirmation, and all payment behavior remain later Phase 5 work.
+
 ### Deliverables
 
 - Pure timezone-aware availability engine plus bounded public availability Route Handler.

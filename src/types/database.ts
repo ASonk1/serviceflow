@@ -34,6 +34,64 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointments: {
+        Row: {
+          buffer_ends_at: string
+          created_at: string
+          ends_at: string
+          id: string
+          organization_id: string
+          service_id: string
+          staff_profile_id: string
+          starts_at: string
+          status: string
+        }
+        Insert: {
+          buffer_ends_at: string
+          created_at?: string
+          ends_at: string
+          id?: string
+          organization_id: string
+          service_id: string
+          staff_profile_id: string
+          starts_at: string
+          status: string
+        }
+        Update: {
+          buffer_ends_at?: string
+          created_at?: string
+          ends_at?: string
+          id?: string
+          organization_id?: string
+          service_id?: string
+          staff_profile_id?: string
+          starts_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_service_fk"
+            columns: ["organization_id", "service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "appointments_staff_fk"
+            columns: ["organization_id", "staff_profile_id"]
+            isOneToOne: false
+            referencedRelation: "staff_profiles"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -127,6 +185,67 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "blocked_times_org_staff_fk"
+            columns: ["organization_id", "staff_profile_id"]
+            isOneToOne: false
+            referencedRelation: "staff_profiles"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      booking_holds: {
+        Row: {
+          buffer_ends_at: string
+          created_at: string
+          ends_at: string
+          expires_at: string
+          id: string
+          organization_id: string
+          service_id: string
+          staff_profile_id: string
+          starts_at: string
+          status: string
+        }
+        Insert: {
+          buffer_ends_at: string
+          created_at?: string
+          ends_at: string
+          expires_at: string
+          id?: string
+          organization_id: string
+          service_id: string
+          staff_profile_id: string
+          starts_at: string
+          status: string
+        }
+        Update: {
+          buffer_ends_at?: string
+          created_at?: string
+          ends_at?: string
+          expires_at?: string
+          id?: string
+          organization_id?: string
+          service_id?: string
+          staff_profile_id?: string
+          starts_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_holds_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_holds_service_fk"
+            columns: ["organization_id", "service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "booking_holds_staff_fk"
             columns: ["organization_id", "staff_profile_id"]
             isOneToOne: false
             referencedRelation: "staff_profiles"
@@ -800,6 +919,16 @@ export type Database = {
         Returns: Json
       }
       get_owner_team: { Args: { target_org_id: string }; Returns: Json }
+      get_public_availability_context: {
+        Args: {
+          as_of?: string
+          local_date: string
+          public_service_id: string
+          public_slug: string
+          public_staff_id: string
+        }
+        Returns: Json
+      }
       get_public_business: { Args: { public_slug: string }; Returns: Json }
       list_managed_services: {
         Args: {

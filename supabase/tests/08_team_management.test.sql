@@ -43,7 +43,7 @@ set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000101","role":"authenticated"}',true);
 select is(public.set_team_member_status((select id from accepted_membership),'inactive'),'inactive','owner deactivates same-tenant staff');
 select is((select is_active from service_staff where staff_profile_id=(select id from staff_profiles where membership_id=(select id from accepted_membership))),false,'deactivation disables active service assignments');
-select is((select is_active from service_staff where staff_profile_id='13000000-0000-4000-8000-000000000102'),true,'unrelated assignments are preserved');
+select is((select bool_and(is_active) from service_staff where staff_profile_id='13000000-0000-4000-8000-000000000102'),true,'unrelated assignments are preserved');
 select is(public.set_team_member_status((select id from accepted_membership),'inactive'),'inactive','deactivation retry is idempotent');
 select throws_ok($$select public.set_team_member_status('11000000-0000-4000-8000-000000000101','inactive')$$,'23514','final active owner','final active owner is protected');
 select throws_ok($$update organization_invitations set status='accepted',accepted_at=now() where id='18000000-0000-4000-8000-000000000105'$$,'42501',null,'direct invitation writes are denied by privileges');
